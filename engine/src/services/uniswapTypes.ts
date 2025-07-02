@@ -1,5 +1,5 @@
 export type TokenData = {
-    symbols: string;
+    symbol: string;
     id: string;
     decimals: string;
     name?: string;
