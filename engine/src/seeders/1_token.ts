@@ -47,4 +47,4 @@ export class TokenSeeder implements ISeeder {
   }
 }
 
-export default new TokenSeeder().execute();
+export default new TokenSeeder();
