@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-//Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../data"
@@ -23,19 +17,31 @@ model tokens {
 }
 
 model pools {
-
-  id String @id @map("_id")
-  token0 String
-  token1 String
-  symbol String
-  symbol0 String
-  symbol1 String
-  fee Int
+  id       String   @id @map("_id")
+  token0   String
+  token1   String
+  symbol   String
+  symbol0  String
+  symbol1  String
+  fee      Int
   exchange Int
-  network Int
-  price0 String
-  price0Change Float
-  lastUpdate DateTime
-  price1 String
-  price1Change Float
+  network  Int
+
+  price0           String
+  price0Change     Float
+  price0_15        String
+  price0_15Change  Float
+  price0_60        String
+  price0_60Change  Float
+
+  lastUpdate       DateTime
+  lastUpdate_15    DateTime
+  lastUpdate_60    DateTime
+
+  price1           String
+  price1Change     Float
+  price1_15        String
+  price1_15Change  Float
+  price1_60        String
+  price1_60Change  Float
 }
