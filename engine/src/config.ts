@@ -29,6 +29,7 @@ const EXCHANGE2: Exchange = getExchange(`${process.env.EXCHANGE}`)
 const DATABASE_URL: string =`${process.env.DATABASE_URL}`;
 const UNISWAP_GRAPH_URL: string = `${process.env.UNISWAP_GRAPH_URL}`;
 const POOL_COUNT: number = parseInt(`${process.env.POOL_COUNT}`);
+const WS_PORT: number = parseInt(`${process.env.WS_PORT}`);
 
 export default {
   INTERVAL,
@@ -39,4 +40,5 @@ export default {
   DATABASE_URL,
   UNISWAP_GRAPH_URL,
   POOL_COUNT,
+  WS_PORT
 };
