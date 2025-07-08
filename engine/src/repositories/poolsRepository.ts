@@ -56,7 +56,9 @@ function buildSet(newprice: number, pool: any, tokenNumber: string, minutes: num
 }
 
 function builSetFull(pool: Pool, newPrice: number, tokenNumber: string){
-    if(["0", "1"].includes(tokenNumber)) throw new Error(`Token number must be 0 or 1.`);
+    if(!["0", "1"].includes(tokenNumber)){
+      throw new Error(`Token number must be 0 or 1.`);
+    } 
 
     const oldPrice = Number(tokenNumber == "0"?  pool.price0 : pool.price1);
     const priceChange = ((newPrice - oldPrice) / oldPrice) * 100;

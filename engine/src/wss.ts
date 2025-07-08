@@ -1,6 +1,6 @@
 import Websocket, { WebSocketServer } from "ws";
 import Config from "./config";
-import {IncomingMessage} from "http";
+import { IncomingMessage } from "http";
 
 let wss: CerberusWSS | undefined;
 
@@ -45,28 +45,27 @@ class CerberusWSS extends WebSocketServer {
   }
 }
 
-function verifyClient(info: any, callBack: Function){
-    return callBack(true);
+function verifyClient(info: any, callBack: Function) {
+  return callBack(true);
 }
 
 export default (): CerberusWSS => {
-    if(wss) return wss;
+  if (wss) return wss;
 
-    wss = new CerberusWSS({
-        port: Config.WS_PORT,
-        verifyClient
-    });
+  wss = new CerberusWSS({
+    port: Config.WS_PORT,
+    verifyClient,
+  });
 
-    wss.on("connection", (ws: CerberusWS, req: IncomingMessage)=>{
-        if(!req.url) return;
+  wss.on("connection", (ws: CerberusWS, req: IncomingMessage) => {
+    if (!req.url) return;
 
-        ws.id = req.url;//to do: implementar segurança no futuro
-        ws.on("mesage", (data)=>console.log(data));
-        ws.on("error", (err)=>console.error(err));
-        console.log("ws.onConnection: "+ req.url);
+    ws.id = req.url; //to do: implementar segurança no futuro
+    ws.on("mesage", (data) => console.log(data));
+    ws.on("error", (err) => console.error(err));
+    console.log("ws.onConnection: " + req.url);
+  });
 
-        console.log(`Cerberus Websocket is running.`);
-    })
-
-    return wss;
-}
+  console.log(`Cerberus Websocket Server is running.`);
+  return wss;
+};
