@@ -23,8 +23,7 @@ export default function Register() {
   const router = useRouter();
 
   function btnSaveClick() {
-    // router.push("/activate");
-    window.alert(JSON.stringify(user, null, 2));
+    router.push("/register/activate");
   }
 
   function onUserChange(evt: React.ChangeEvent<HTMLInputElement>){
