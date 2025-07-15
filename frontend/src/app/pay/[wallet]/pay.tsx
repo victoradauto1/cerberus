@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import FooterSmall from "../../../components/Footers/FooterSmall.js";
@@ -9,20 +9,29 @@ import Navbar from "../../../components/Navbars/AuthNavbar.js";
 
 export default function Pay() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const params = useParams();
 
+  const wallet: string  = typeof params.wallet === "string" ? params.wallet : params.wallet[0] 
+
+  const [user, setUser] = useState<any>();
+  const [plan, setPlan] = useState<any>();
   const [message, setMessage] = useState<string>("");
-  const [code, setCode] = useState<string>(searchParams.get("code") || "");
-  const [wallet, setWallet] = useState<string>(
-    searchParams.get("wallet") || ""
-  );
 
-  useEffect(() => {
-    if (code && code.length === 6 && wallet) {
-      console.log(code, wallet);
-      router.push("/pay");
-    }
-  }, [code, wallet]);
+  useEffect(()=>{
+    setUser({
+
+        //carregar dados do usuário do banco
+        name: "Victor",
+        wallet,
+        planId:1
+
+    })
+
+    // carregar dados do plano
+    setPlan({
+
+    })
+  },[wallet])
 
   function btnActivateClick() {
     router.push("/pay");
@@ -49,8 +58,7 @@ export default function Pay() {
                     </div>
                     <div className="text-center mb-3">
                       <h6 className="text-blueGray-500 text-sm font-bold">
-                        We sent you a code by email right now. Fill bellow thew
-                        six numbers.
+                        Below is your plan detalis.
                       </h6>
                     </div>
                     <form>
@@ -59,16 +67,23 @@ export default function Pay() {
                           className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
                           htmlFor="grid-password"
                         >
-                          Code
+                          User
                         </label>
-                        <input
-                          type="number"
-                          id="code"
-                          className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                          placeholder="000000"
-                          value={code}
-                          onChange={(evt) => setCode(evt.target.value)}
-                        />
+                        <div>
+                            {user.name}<br/>{user.wallet}
+                        </div>
+                      </div>
+                       <div className="relative w-full mb-3">
+                        <label
+                          className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
+                          htmlFor="grid-password"
+                        >
+                          Plan
+                        </label>
+                        <select id="planId" value={plan.id} onChange={(evt)=> setPlan({...plan, id: evt.target.value})} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option value={plan.id}>Gold</option>
+                        </select>
+                        
                       </div>
                       <div className="text-center mt-6">
                         <button
