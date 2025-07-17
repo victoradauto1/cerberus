@@ -11,30 +11,28 @@ export default function Pay() {
   const router = useRouter();
   const params = useParams();
 
-  const wallet: string  = typeof params.wallet === "string" ? params.wallet : params.wallet[0] 
+  const wallet: string = Array.isArray(params.wallet)
+    ? params.wallet[0]
+    : params.wallet ?? "";
 
-  const [user, setUser] = useState<any>();
-  const [plan, setPlan] = useState<any>();
+  const [user, setUser] = useState<any>({});
+  const [plan, setPlan] = useState<any>({});
   const [message, setMessage] = useState<string>("");
 
-  useEffect(()=>{
+  useEffect(() => {
     setUser({
-
-        //carregar dados do usuário do banco
-        name: "Victor",
-        wallet,
-        planId:1
-
-    })
+      //carregar dados do usuário do banco
+      name: "Victor",
+      wallet,
+      planId: 1,
+    });
 
     // carregar dados do plano
-    setPlan({
+    setPlan({});
+  }, [wallet]);
 
-    })
-  },[wallet])
-
-  function btnActivateClick() {
-    router.push("/pay");
+  function btnPayClick() {
+    router.push("/dashboard");
   }
 
   return (
@@ -70,28 +68,43 @@ export default function Pay() {
                           User
                         </label>
                         <div>
-                            {user.name}<br/>{user.wallet}
+                          {user.name}
+                          <br />
+                          {user.wallet}
                         </div>
                       </div>
-                       <div className="relative w-full mb-3">
+                      <div className="relative w-full mb-3">
                         <label
                           className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
                           htmlFor="grid-password"
                         >
                           Plan
                         </label>
-                        <select id="planId" value={plan.id} onChange={(evt)=> setPlan({...plan, id: evt.target.value})} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option value={plan.id}>Gold</option>
+                        <select
+                          id="planId"
+                          value={plan.id}
+                          onChange={(evt) =>
+                            setPlan({ ...plan, id: evt.target.value })
+                          }
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
+                          <option value={plan.id}>Gold</option>
                         </select>
-                        
+                      </div>
+
+                      <div className="mt-3">
+                        This plan costs <strong>{plan.symbol}{plan.price}/mo.</strong> and gives you full acess to our plataform and <strong>{plan.maxAutomations}</strong> automations.
+                      </div>
+                      <div>
+                        Your last payment was: <strong>Never</strong>
                       </div>
                       <div className="text-center mt-6">
                         <button
                           className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 w-full"
                           type="button"
-                          onClick={btnActivateClick}
+                          onClick={btnPayClick}
                         >
-                          Activate account
+                          PAY NOW
                         </button>
                         <div>{message}</div>
                       </div>
