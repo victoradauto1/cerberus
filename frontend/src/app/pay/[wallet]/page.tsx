@@ -6,6 +6,10 @@ import { useEffect, useState } from "react";
 
 import FooterSmall from "../../../components/Footers/FooterSmall.js";
 import Navbar from "../../../components/Navbars/AuthNavbar.js";
+import {User} from "commons/models/user.js"
+import { Status } from "commons/models/status.js";
+import { ChainId } from "commons/models/chainId.js";
+import { Plan } from "commons/models/plan.js"
 
 export default function Pay() {
   const router = useRouter();
@@ -15,20 +19,32 @@ export default function Pay() {
     ? params.wallet[0]
     : params.wallet ?? "";
 
-  const [user, setUser] = useState<any>({});
-  const [plan, setPlan] = useState<any>({});
+  const [user, setUser] = useState<User>({} as User);
+  const [plan, setPlan] = useState<Plan>({} as Plan);
   const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
     setUser({
       //carregar dados do usuário do banco
       name: "Victor",
-      wallet,
-      planId: 1,
+      email: "contato@victor.com",
+      status: Status.BLOCKED,
+      address: wallet,
+      planId: "Gold",
+      network: ChainId.POLYGON_AMOY,
+      activateCode: "123456",
+      activateDate: new Date
     });
 
     // carregar dados do plano
-    setPlan({});
+    setPlan({
+      name:"Gold",
+      id:"Gold",
+      tokenSymbol:"WPOL",
+      tokenAddress:"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+      price:"0.001",
+      maxAutomations: 10
+    });
   }, [wallet]);
 
   function btnPayClick() {
@@ -70,7 +86,7 @@ export default function Pay() {
                         <div>
                           {user.name}
                           <br />
-                          {user.wallet}
+                          {user.address}
                         </div>
                       </div>
                       <div className="relative w-full mb-3">
@@ -93,7 +109,7 @@ export default function Pay() {
                       </div>
 
                       <div className="mt-3">
-                        This plan costs <strong>{plan.symbol}{plan.price}/mo.</strong> and gives you full acess to our plataform and <strong>{plan.maxAutomations}</strong> automations.
+                        This plan costs <strong>{plan.tokenSymbol}{plan.price}/mo.</strong> and gives you full acess to our plataform and <strong>{plan.maxAutomations}</strong> automations.
                       </div>
                       <div>
                         Your last payment was: <strong>Never</strong>

@@ -16,6 +16,18 @@ model tokens {
   network  Int
 }
 
+model users {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  address String @unique
+  name String
+  email String
+  status Int
+  network Int
+  planId String
+  activateCode String
+  activateDate DateTime
+}
+
 model pools {
   id       String   @id @map("_id")
   token0   String
