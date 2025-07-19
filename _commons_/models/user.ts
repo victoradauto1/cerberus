@@ -11,5 +11,6 @@ export type User = {
     planId: string;
     activateCode: string;
     activateDate: Date;
+    
 
 }

@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import FooterSmall from "../../components/Footers/FooterSmall.js";
 import Navbar from "../../components/Navbars/AuthNavbar.js";
 
-type User = {
+type newUser = {
     name: string,
     email: string
 }
@@ -15,15 +15,20 @@ type User = {
 export default function Register() {
   
   const [message, setMessage] = useState<string>("");
-  const [user, setUser] = useState<User>({
+  const [user, setUser] = useState<newUser>({
     name: "",
-    email:""
+    email:"",
   });
 
   const router = useRouter();
 
   function btnSaveClick() {
-    router.push("/register/activate");
+    setMessage("Saving... Wait...")
+    router.push("/regi ster/activate");
+
+    // to do: Conectar na metamask
+
+    // to do: Cadastrar minha backend
   }
 
   function onUserChange(evt: React.ChangeEvent<HTMLInputElement>){

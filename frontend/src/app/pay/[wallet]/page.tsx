@@ -25,7 +25,6 @@ export default function Pay() {
 
   useEffect(() => {
     setUser({
-      //carregar dados do usuário do banco
       name: "Victor",
       email: "contato@victor.com",
       status: Status.BLOCKED,
@@ -35,8 +34,7 @@ export default function Pay() {
       activateCode: "123456",
       activateDate: new Date
     });
-
-    // carregar dados do plano
+    
     setPlan({
       name:"Gold",
       id:"Gold",
@@ -48,6 +46,9 @@ export default function Pay() {
   }, [wallet]);
 
   function btnPayClick() {
+    setMessage("Please, authoraze our recorring charges (montlhy, 1 year authorization). Cancel anytime.");
+    // invocar auitorização na metamask (transfer from);
+    //chamar função pagar do backend;
     router.push("/dashboard");
   }
 

@@ -14,17 +14,39 @@ export default function Activate() {
 
   const [message, setMessage] = useState<string>("");
   const [code, setCode] = useState<string>(searchParams.get("code") || "");
-  const [wallet, setWallet] = useState<string>(searchParams.get("wallet") || "");
+  const [wallet, setWallet] = useState<string>(
+    searchParams.get("wallet") || ""
+  );
 
   useEffect(() => {
-    if (code &&  code.length === 6 && wallet) {
-      console.log(code, wallet);
-      router.push("/pay");
+    if (code && code.length === 6 && wallet) {
+      // console.log(code, wallet);
+
+      // trocar por ativação backend
+      if (
+        code === "123456" &&
+        wallet === "0x6e086E6f338Ed493196326d4Ade46fe02EDAeCB7"
+      )
+        router.push(`/pay/${wallet}`);
     }
   }, [code, wallet]);
 
   function btnActivateClick() {
-    router.push("/pay");
+    if (!code || code.length < 6) {
+      setMessage("The activate code must be 6 digits.");
+      return;
+    }
+
+    setMessage("Activating... wait...");
+    // trocar por ativação backend
+    if (
+      code === "123456" &&
+      wallet === "0x6e086E6f338Ed493196326d4Ade46fe02EDAeCB7"
+    ){
+      router.push(`/pay/${wallet}`);
+    }else{
+      setMessage("Wrong code.")
+    }
   }
 
   return (
