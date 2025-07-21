@@ -37,81 +37,76 @@ export default function CardLineChart() {
       options: {
         maintainAspectRatio: false,
         responsive: true,
-        title: {
-          display: false,
-          text: "Sales Charts",
-          fontColor: "white",
-        },
-        legend: {
-          labels: {
-            fontColor: "white",
+        plugins: {
+          title: {
+            display: false,
+            text: "Sales Charts",
+            color: "white",
           },
-          align: "end",
-          position: "bottom",
+          legend: {
+            labels: {
+              color: "white",
+            },
+            align: "end",
+            position: "bottom",
+          },
+          tooltip: {
+            mode: "index",
+            intersect: false,
+          },
         },
-        tooltips: {
-          mode: "index",
-          intersect: false,
-        },
-        hover: {
+        interaction: {
           mode: "nearest",
           intersect: true,
         },
         scales: {
-          xAxes: [
-            {
-              ticks: {
-                fontColor: "rgba(255,255,255,.7)",
-              },
-              display: true,
-              scaleLabel: {
-                display: false,
-                labelString: "Month",
-                fontColor: "white",
-              },
-              gridLines: {
-                display: false,
-                borderDash: [2],
-                borderDashOffset: [2],
-                color: "rgba(33, 37, 41, 0.3)",
-                zeroLineColor: "rgba(0, 0, 0, 0)",
-                zeroLineBorderDash: [2],
-                zeroLineBorderDashOffset: [2],
-              },
+          x: {
+            ticks: {
+              color: "rgba(255,255,255,.7)",
             },
-          ],
-          yAxes: [
-            {
-              ticks: {
-                fontColor: "rgba(255,255,255,.7)",
-              },
-              display: true,
-              scaleLabel: {
-                display: false,
-                labelString: "Value",
-                fontColor: "white",
-              },
-              gridLines: {
-                borderDash: [3],
-                borderDashOffset: [3],
-                drawBorder: false,
-                color: "rgba(255, 255, 255, 0.15)",
-                zeroLineColor: "rgba(33, 37, 41, 0)",
-                zeroLineBorderDash: [2],
-                zeroLineBorderDashOffset: [2],
-              },
+            display: true,
+            title: {
+              display: false,
+              text: "Month",
+              color: "white",
             },
-          ],
+            grid: {
+              display: false,
+              borderDash: [2],
+              borderDashOffset: [2],
+              color: "rgba(33, 37, 41, 0.3)",
+              borderColor: "rgba(0, 0, 0, 0)",
+            },
+          },
+          y: {
+            ticks: {
+              color: "rgba(255,255,255,.7)",
+            },
+            display: true,
+            title: {
+              display: false,
+              text: "Value",
+              color: "white",
+            },
+            grid: {
+              borderDash: [3],
+              borderDashOffset: [3],
+              drawBorder: false,
+              color: "rgba(255, 255, 255, 0.15)",
+              borderColor: "rgba(33, 37, 41, 0)",
+            },
+          },
         },
       },
     };
     var ctx = document.getElementById("line-chart").getContext("2d");
     window.myLine = new Chart(ctx, config);
 
-    return ()=>{
+    return () => {
       window.myLine.destroy();
-    }
+    };
   }, []);
+
   return (
     <>
       <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-blueGray-700">
