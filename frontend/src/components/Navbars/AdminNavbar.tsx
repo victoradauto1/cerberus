@@ -4,7 +4,11 @@ import React from "react";
 
 import UserDropdown from "@/components/Dropdowns/UserDropdown";
 
-export default function Navbar() {
+type Props ={
+  pageName: string;
+}
+
+export default function Navbar(props: Props) {
   return (
     <>
       {/* Navbar */}
@@ -13,10 +17,10 @@ export default function Navbar() {
           {/* Brand */}
           <a
             className="text-white text-sm uppercase hidden lg:inline-block font-semibold"
-            href="#pablo"
+            href="#"
             onClick={(e) => e.preventDefault()}
           >
-            Dashboard
+            {props.pageName}
           </a>
           {/* User */}
           <ul className="flex-col md:flex-row list-none items-center hidden md:flex">
