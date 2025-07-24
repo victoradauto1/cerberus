@@ -10,6 +10,9 @@ import {User} from "commons/models/user.js"
 import { Status } from "commons/models/status.js";
 import { ChainId } from "commons/models/chainId.js";
 import { Plan } from "commons/models/plan.js"
+import { startPayment } from "@/services/Web3Services.js";
+import { Result } from "ethers";
+import { error } from "console";
 
 export default function Pay() {
   const router = useRouter();
@@ -24,6 +27,12 @@ export default function Pay() {
   const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
+
+    setMessage("Loading payment info...");
+
+    // to do: obter jwt 
+
+    // to do: validar informações de pagamentos
     setUser({
       name: "Victor",
       email: "contato@victor.com",
@@ -47,9 +56,14 @@ export default function Pay() {
 
   function btnPayClick() {
     setMessage("Please, authoraze our recorring charges (montlhy, 1 year authorization). Cancel anytime.");
-    // invocar auitorização na metamask (transfer from);
-    //chamar função pagar do backend;
-    router.push("/dashboard");
+    startPayment(plan)
+      .then(result =>{
+        setMessage("Payment authorized. Starting the first month charge... wait...")
+        //to do:chamar função pagar do backend;
+        return Promise.resolve();
+      })
+      .then(result=> router.push("/dashboard"))
+      .catch(err => setMessage(err.response? err.response.messager : err.message))
   }
 
   return (

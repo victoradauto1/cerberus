@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import {getWallet} from "@/services/Web3Services.js"
 
 import FooterSmall from "../../components/Footers/FooterSmall.js";
 import Navbar from "../../components/Navbars/AuthNavbar.js";
@@ -22,13 +23,30 @@ export default function Register() {
 
   const router = useRouter();
 
-  function btnSaveClick() {
+  async function register () {
     setMessage("Saving... Wait...")
     router.push("/regi ster/activate");
 
-    // to do: Conectar na metamask
+    let wallet = localStorage.getItem("wallet");
+    if(!wallet){
+      try{
+        wallet = await getWallet();
+      }catch(err:any){
+        setMessage(err.message);
+        return;
+      }
+      
+    }
 
     // to do: Cadastrar minha backend
+
+    console.log(wallet)
+
+    router.push("/register/activate?wallet"+ wallet)
+  }
+
+  function btnSaveClick() {
+    register();
   }
 
   function onUserChange(evt: React.ChangeEvent<HTMLInputElement>){
