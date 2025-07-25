@@ -11,7 +11,7 @@ import { Status } from "commons/models/status.js";
 import { ChainId } from "commons/models/chainId.js";
 import { Plan } from "commons/models/plan.js"
 import { startPayment } from "@/services/Web3Services.js";
-import { Result } from "ethers";
+import { ethers, Result } from "ethers";
 import { error } from "console";
 
 export default function Pay() {
@@ -23,7 +23,14 @@ export default function Pay() {
     : params.wallet ?? "";
 
   const [user, setUser] = useState<User>({} as User);
-  const [plan, setPlan] = useState<Plan>({} as Plan);
+  const [plan, setPlan] = useState<Plan>({
+      name:"Gold",
+      id:"Gold",
+      tokenSymbol:"WPOL",
+      tokenAddress:"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+      price: ethers.parseEther("0.0001").toString(),
+      maxAutomations: 10
+    } as Plan);
   const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
@@ -42,15 +49,6 @@ export default function Pay() {
       network: ChainId.POLYGON_AMOY,
       activateCode: "123456",
       activateDate: new Date
-    });
-    
-    setPlan({
-      name:"Gold",
-      id:"Gold",
-      tokenSymbol:"WPOL",
-      tokenAddress:"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-      price:"0.001",
-      maxAutomations: 10
     });
   }, [wallet]);
 
@@ -124,7 +122,7 @@ export default function Pay() {
                       </div>
 
                       <div className="mt-3">
-                        This plan costs <strong>{plan.tokenSymbol}{plan.price}/mo.</strong> and gives you full acess to our plataform and <strong>{plan.maxAutomations}</strong> automations.
+                        This plan costs <strong>{plan.tokenSymbol}{`${ethers.formatEther(plan.price)}`}/mo.</strong> and gives you full acess to our plataform and <strong>{plan.maxAutomations}</strong> automations.
                       </div>
                       <div>
                         Your last payment was: <strong>Never</strong>
