@@ -1,12 +1,14 @@
+import ConfigBase from "commons/configBase"
 import { ChainId } from "commons/models/chainId";
 import { Exchange } from "commons/models/exchange";
-import dotenv from "dotenv";
-dotenv.config();
 
-const INTERVAL: number = parseInt(`${process.env.INTERVAL}`);
-const NETWORK: string = `${process.env.NETWORK}`;
+export default class Config extends ConfigBase{
 
-function getNetwork(network: string): ChainId{
+  
+static MONITOR_INTERVAL: number = parseInt(`${process.env.INTERVAL}`);
+static NETWORK: string = `${process.env.NETWORK}`;
+
+static getNetwork(network: string): ChainId{
   switch(network){
     case "polygon": return ChainId.POLYGON_MAINNET;
     case "polygon_test": return ChainId.POLYGON_AMOY;
@@ -14,10 +16,10 @@ function getNetwork(network: string): ChainId{
     default: return ChainId.ETH_MAINNET;
   }
 }
-const NETWORK2: ChainId = getNetwork(`${process.env.NETWORK}`);
-const EXCHANGE: string = `${process.env.EXCHANGE}`;
+static NETWORK2: ChainId = Config.getNetwork(`${Config.NETWORK}`);
+static EXCHANGE: string = `${process.env.EXCHANGE}`;
 
-function getExchange(exchange: string): Exchange{
+static getExchange(exchange: string): Exchange{
   switch(exchange){
     case "uniswap": return Exchange.Uniswap;
     case "pancake": return Exchange.PancakeSwap;
@@ -25,20 +27,8 @@ function getExchange(exchange: string): Exchange{
   }
 }
 
-const EXCHANGE2: Exchange = getExchange(`${process.env.EXCHANGE}`)
-const DATABASE_URL: string =`${process.env.DATABASE_URL}`;
-const UNISWAP_GRAPH_URL: string = `${process.env.UNISWAP_GRAPH_URL}`;
-const POOL_COUNT: number = parseInt(`${process.env.POOL_COUNT}`);
-const WS_PORT: number = parseInt(`${process.env.WS_PORT}`);
-
-export default {
-  INTERVAL,
-  NETWORK,
-  NETWORK2,
-  EXCHANGE,
-  EXCHANGE2,
-  DATABASE_URL,
-  UNISWAP_GRAPH_URL,
-  POOL_COUNT,
-  WS_PORT
-};
+static EXCHANGE2: Exchange = Config.getExchange(`${Config.EXCHANGE}`)
+static UNISWAP_GRAPH_URL: string = `${process.env.UNISWAP_GRAPH_URL}`;
+static POOL_COUNT: number = parseInt(`${process.env.POOL_COUNT}`);
+static WS_PORT: number = parseInt(`${process.env.WS_PORT}`);
+}

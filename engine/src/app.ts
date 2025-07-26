@@ -29,7 +29,7 @@ async function executionCycle(){
     }
 }
 
-setInterval(executionCycle, Config.INTERVAL);
+setInterval(executionCycle, Config.MONITOR_INTERVAL);
 
 
 executionCycle();
