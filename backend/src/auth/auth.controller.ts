@@ -1,16 +1,18 @@
 import { Controller,Body, Get, Post, Param, ParseIntPipe } from '@nestjs/common';
 import { Wallet } from 'ethers';
+import { AuthDTO } from './auth.dto';
+import { UserDTO } from './user.dto';
 
 @Controller('auth')
 export class AuthController {
   
     @Post('singin')
-    singin(@Body() data): object{
+    singin(@Body() data: AuthDTO): object{
         return data;
     }
 
     @Post('singup')
-    singup(@Body() data):object{
+    singup(@Body() data: UserDTO):object{
         return data;
 
     }
