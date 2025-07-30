@@ -7,11 +7,10 @@ import {
 } from '@nestjs/common';
 import { Status } from 'commons/models/status';
 import { User } from 'commons/models/user';
+import { decrypt, encrypt } from 'commons/services/cryptoService';
 import Config from '../config';
 import connect from '../db';
 import { UserDTO } from './user.dto';
-import { Subscriber } from 'rxjs';
-
 @Injectable()
 export class UserService {
   async getUserByWallet(address: string): Promise<User> {
@@ -46,19 +45,19 @@ export class UserService {
       throw new NotFoundException(`User with id ${id} not found`);
     }
 
-    // user.privateKey = "" to do: descriptografar a private key
+    user.privateKey = decrypt(user.privateKey);
 
     return user;
   }
 
-  static generateActivateCode(length: number ): string {
-    const validChars = "0123456789";
-    let code = "";
-    for( let i = 0; i < length; i++){
-        code += validChars[Math.floor(Math.random()* 10)];
-    };
+  static generateActivateCode(length: number): string {
+    const validChars = '0123456789';
+    let code = '';
+    for (let i = 0; i < length; i++) {
+      code += validChars[Math.floor(Math.random() * 10)];
+    }
 
-    return code
+    return code;
   }
 
   async addUser(user: UserDTO): Promise<User> {
@@ -127,56 +126,52 @@ export class UserService {
     return user;
   }
 
-  async updateUser(id: string, user: UserDTO): Promise<User>{
+  async updateUser(id: string, user: UserDTO): Promise<User> {
     const db = await connect();
 
     const data: any = {
-        address: user.address,
-        email: user.email,
-        name: user.name,
-        status: user.status
-    }
+      address: user.address,
+      email: user.email,
+      name: user.name,
+    };
 
-    if(user.privateKey){
-        data.privateKey = ""; // to do: criptografar nova private key
+    if (user.privateKey) {
+      data.privateKey = encrypt(user.privateKey);
     }
 
     const updatedUser = await db.users.update({
-        where:{id},
-        data
+      where: { id },
+      data,
     });
 
-   
-    updatedUser.privateKey = ""; 
+    updatedUser.privateKey = '';
 
     return updatedUser;
-
   }
 
-  async activateUser(wallet: string, code: string): Promise<User>{
+  async activateUser(wallet: string, code: string): Promise<User> {
     const user = await this.getUserByWallet(wallet);
 
-    if(!user) throw new NotFoundException();
+    if (!user) throw new NotFoundException();
 
-    if(user.status !== Status.NEW) return user;
+    if (user.status !== Status.NEW) return user;
 
-    if(user.activateCode !== code)
-        throw new UnauthorizedException(`Wrong activate code.`)
-    
+    if (user.activateCode !== code)
+      throw new UnauthorizedException(`Wrong activate code.`);
+
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
     if (user.activateDate < tenMinutesAgo)
-        throw new UnauthorizedException(`activate code expired.`)
+      throw new UnauthorizedException(`activate code expired.`);
 
     const db = await connect();
     const updatedUser = await db.users.update({
-        where:{ id: user.id},
-        data: { status: Status.BLOCKED}
+      where: { id: user.id },
+      data: { status: Status.BLOCKED },
     });
 
-    updatedUser.privateKey = "";
+    updatedUser.privateKey = '';
 
-    return updatedUser
+    return updatedUser;
   }
-
 }

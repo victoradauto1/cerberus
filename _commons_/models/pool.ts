@@ -13,10 +13,10 @@ export default class Pool {
   network: ChainId;
   price0: string;
   price0Change: number;
-  price0_15: string;
-  price0_15Change: number;
-  price0_60: string;
-  price0_60Change: number;
+  price0_15: string | null;
+  price0_15Change: number | null;
+  price0_60: string | null;
+  price0_60Change: number | null;
 
   lastUpdate: Date;
   lastUpdate_15: Date;
@@ -25,10 +25,10 @@ export default class Pool {
 
   price1: string;
   price1Change: number;
-  price1_15: string;
-  price1_15Change: number;
-  price1_60: string;
-  price1_60Change: number;
+  price1_15: string | null;
+  price1_15Change: number | null;
+  price1_60: string | null;
+  price1_60Change: number | null;
 
   constructor(pool: Pool) {
     this.id = pool.id;
