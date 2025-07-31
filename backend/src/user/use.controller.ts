@@ -1,46 +1,67 @@
-import { Controller, Post, Headers, Get, Param, Patch, Body } from "@nestjs/common";
-import { UserService } from "./use.service";
-import { UserDTO } from "./user.dto";
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthService } from 'src/auth/auth.service';
+import { AuthGuard } from '../auth/auth.guard';
+import { UserService } from './use.service';
+import { UserDTO } from './user.dto';
 
-@Controller("users")
-export class UserController{
+@Controller('users')
+export class UserController {
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
-    constructor(private readonly userService: UserService){
+  @UseGuards(AuthGuard)
+  @Post('pay')
+  async pay(@Headers('Authorization') authorization) {
+    const jwt = this.authService.decodeToken(authorization);
 
+    return this.userService.payUSer(jwt.address);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get(':identifier')
+  async getUser(
+    @Headers('Authorization') authorization,
+    @Param('identifier') identifier: string,
+  ) {
+    const jwt = this.authService.decodeToken(authorization);
+
+    if (identifier.startsWith('0x')) {
+      if (identifier.startsWith('0x')) {
+        if (jwt.address.toUpperCase() !== identifier.toUpperCase())
+          throw new ForbiddenException();
+        return this.userService.getUserByWallet(identifier);
+      }
+    } else {
+      if (jwt.address.toUpperCase() !== identifier.toUpperCase())
+        throw new ForbiddenException();
+      const user = await this.userService.getUserById(identifier);
+      user.privateKey = '';
+      return user;
     }
+  }
 
-    @Post("pay")
-    async pay(@Headers("Authorization") authorization){
-        //to do: token decode
-
-        return this.userService.payUSer("");
-    }
-
-    @Get(":identifier")
-    async getUser(@Headers("Authorization") authorization, @Param("identifier")identifier: string ){
-        //to do: token decode
-
-        if(identifier.startsWith("0x")){
-            //to do:JWT vs identifier
-
-            return this.userService.getUserByWallet(identifier);
-        } else{
-            //to do:JWT vs identifier
-
-            const user =  await this.userService.getUserById(identifier);
-            user.privateKey = "";
-
-            return user;
-        }
-    }
-
-    @Patch(":id")
-    async updateUser( @Headers("Authorization") authorization, @Param("id") id: string, @Body() user: UserDTO){
-
-        //to do: token decode
-        //to do:JWT vs id
-
-        return this.userService.updateUser(id, user);
-
-    }
+  @UseGuards(AuthGuard)
+  @Patch(':id')
+  async updateUser(
+    @Headers('Authorization') authorization,
+    @Param('id') id: string,
+    @Body() user: UserDTO,
+  ) {
+    const jwt = this.authService.decodeToken(authorization);
+    if (jwt.address.toUpperCase() !== id.toUpperCase())
+      throw new ForbiddenException();
+    return this.userService.updateUser(id, user);
+  }
 }

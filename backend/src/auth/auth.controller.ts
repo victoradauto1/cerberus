@@ -1,10 +1,11 @@
 import {
   Controller,
   Body,
-  Get,
   Post,
   Param,
-  ParseIntPipe,
+  BadRequestException,
+  UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { AuthDTO } from './auth.dto';
 import { UserDTO } from '../user/user.dto';
@@ -12,21 +13,53 @@ import { UserService } from '../user/use.service';
 import { User } from 'commons/models/user';
 import { MailerService } from '@nestjs-modules/mailer';
 import Config from '../config';
-import { authService } from './auth.service';
+import { AuthService } from './auth.service';
 import { JWT } from 'commons/models/jwt';
 import { Status } from 'commons/models/status';
+import { ethers, Wallet } from 'ethers';
+import { NotFoundError } from 'rxjs';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly userService: UserService,
     private readonly mailerService: MailerService,
-    private readonly authService: authService,
+    private readonly authService: AuthService,
   ) {}
 
   @Post('singin')
-  singin(@Body() data: AuthDTO): object {
-    return data;
+  async singin(@Body() data: AuthDTO): Promise<string> {
+    const aMinAgo = Date.now() - 60 * 1000;
+    if (data.timestamp < aMinAgo)
+      throw new BadRequestException('timestamp too old.');
+
+    const message = Config.AUTH_MSG.replace(
+      '<timestamp>',
+      Date.now().toString(),
+    );
+
+    let wallet;
+    try {
+      wallet = ethers.verifyMessage(message, data.secret);
+    } catch (error) {
+      throw new BadRequestException('Invalid secret.');
+    }
+
+    if (wallet.toUpperCase() === data.wallet.toUpperCase()) {
+      const user = await this.userService.getUserByWallet(wallet);
+      if (!user) throw new NotFoundException('User not found. Signup first.');
+      if (user.status === Status.BANNED)
+        throw new UnauthorizedException('Banned user.');
+      return this.authService.createJwt({
+        userId: user.id,
+        address: user.address,
+        name: user.name,
+        planId: user.planId,
+        status: user.status,
+      } as JWT);
+    }
+
+    throw new UnauthorizedException("Wallet and secret doesn't match.");
   }
 
   @Post('singup')
