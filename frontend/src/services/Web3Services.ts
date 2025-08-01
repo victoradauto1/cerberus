@@ -5,6 +5,7 @@ import { Status } from "commons/models/status";
 import { Plan } from "commons/models/plan";
 import { Contract } from "ethers";
 import ERC20_ABI from "commons/services/ERC20.json"
+import { Auth, signIn } from "./AuthService";
 
 function getProvider() {
   if (!window.ethereum) throw new Error("No Metamsk found!");
@@ -26,14 +27,20 @@ export async function getWallet(): Promise<string> {
 export async function doLogin(): Promise<JWT | undefined> {
   const timestamp = Date.now();
   const message = ConfigService.getAuthMsg();
-  const wallet = getWallet();
+  const wallet = await getWallet();
   const provider = getProvider();
   const signer = await provider.getSigner();
 
   const challenge = await signer.signMessage(message);
   console.log(challenge);
 
-  // to do : enviar timestamp, wallet e challenge para o back end
+  const token =  await signIn({
+    secret: challenge,
+    timestamp,
+    wallet
+  } as Auth)
+
+  localStorage.setItem("token", token);
 
   return {
     address:"0x6e086E6f338Ed493196326d4Ade46fe02EDAeCB7",
