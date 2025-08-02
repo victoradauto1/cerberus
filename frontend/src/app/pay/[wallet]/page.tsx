@@ -6,13 +6,15 @@ import { useEffect, useState } from "react";
 
 import FooterSmall from "../../../components/Footers/FooterSmall.js";
 import Navbar from "../../../components/Navbars/AuthNavbar.js";
-import {User} from "commons/models/user.js"
+import { User } from "commons/models/user.js";
 import { Status } from "commons/models/status.js";
 import { ChainId } from "commons/models/chainId.js";
-import { Plan } from "commons/models/plan.js"
+import { Plan } from "commons/models/plan.js";
 import { startPayment } from "@/services/Web3Services.js";
 import { ethers, Result } from "ethers";
 import { error } from "console";
+import { getJwt, signOut } from "@/services/AuthService.js";
+import { getUser, payUser } from "@/services/UserService.js";
 
 export default function Pay() {
   const router = useRouter();
@@ -24,44 +26,59 @@ export default function Pay() {
 
   const [user, setUser] = useState<User>({} as User);
   const [plan, setPlan] = useState<Plan>({
-      name:"Gold",
-      id:"Gold",
-      tokenSymbol:"WPOL",
-      tokenAddress:"0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
-      price: ethers.parseEther("0.0001").toString(),
-      maxAutomations: 10
-    } as Plan);
+    name: "Gold",
+    id: "Gold",
+    tokenSymbol: "WPOL",
+    tokenAddress: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+    price: ethers.parseEther("0.0001").toString(),
+    maxAutomations: 10,
+  } as Plan);
   const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
-
     setMessage("Loading payment info...");
 
-    // to do: obter jwt 
+    const jwt = getJwt();
 
-    // to do: validar informações de pagamentos
-    setUser({
-      name: "Victor",
-      email: "contato@victor.com",
-      status: Status.BLOCKED,
-      address: wallet,
-      planId: "Gold",
-      network: ChainId.POLYGON_AMOY,
-      activateCode: "123456",
-      activateDate: new Date
-    });
+    if (!wallet || !jwt || jwt.address.toUpperCase() !== wallet.toUpperCase()) {
+      signOut();
+      return;
+    }
+
+    getUser(jwt.address)
+      .then((user) => {
+        if (user.status === Status.ACTIVE) {
+          router.push("/dashboard");
+          return;
+        }
+        if (user.status !== Status.BLOCKED) {
+          signOut();
+          return;
+        }
+
+        setUser(user);
+        setMessage("");
+      })
+      .catch((error) =>
+        setMessage(error.response ? error.response.data : error.message)
+      );
   }, [wallet]);
 
   function btnPayClick() {
-    setMessage("Please, authoraze our recorring charges (montlhy, 1 year authorization). Cancel anytime.");
+    setMessage(
+      "Please, authoraze our recorring charges (montlhy, 1 year authorization). Cancel anytime."
+    );
     startPayment(plan)
-      .then(result =>{
-        setMessage("Payment authorized. Starting the first month charge... wait...")
-        //to do:chamar função pagar do backend;
-        return Promise.resolve();
+      .then((result) => {
+        setMessage(
+          "Payment authorized. Starting the first month charge... wait..."
+        );
+        return payUser();
       })
-      .then(result=> router.push("/dashboard"))
-      .catch(err => setMessage(err.response? err.response.messager : err.message))
+      .then((result) => router.push("/dashboard"))
+      .catch((err) =>
+        setMessage(err.response ? JSON.stringify(err.response.data) : err.message)
+      );
   }
 
   return (
@@ -122,7 +139,13 @@ export default function Pay() {
                       </div>
 
                       <div className="mt-3">
-                        This plan costs <strong>{plan.tokenSymbol}{`${ethers.formatEther(plan.price)}`}/mo.</strong> and gives you full acess to our plataform and <strong>{plan.maxAutomations}</strong> automations.
+                        This plan costs{" "}
+                        <strong>
+                          {plan.tokenSymbol}
+                          {`${ethers.formatEther(plan.price)}`}/mo.
+                        </strong>{" "}
+                        and gives you full acess to our plataform and{" "}
+                        <strong>{plan.maxAutomations}</strong> automations.
                       </div>
                       <div>
                         Your last payment was: <strong>Never</strong>

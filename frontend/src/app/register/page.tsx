@@ -7,6 +7,9 @@ import {getWallet} from "@/services/Web3Services.js"
 
 import FooterSmall from "../../components/Footers/FooterSmall.js";
 import Navbar from "../../components/Navbars/AuthNavbar.js";
+import { signUp } from "@/services/AuthService.js";
+import { User } from "commons/models/user.js";
+import { responseCookiesToRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies.js";
 
 type newUser = {
     name: string,
@@ -38,11 +41,18 @@ export default function Register() {
       
     }
 
-    // to do: Cadastrar minha backend
-
-    console.log(wallet)
+   try {
+     await signUp({
+      name: user.name,
+      address: wallet,
+      email: user.email,
+      planId: "Gold"
+    } as User)
 
     router.push("/register/activate?wallet"+ wallet)
+   } catch (err: any) {
+    setMessage(err.response? JSON.stringify(err.response.data): err.message)
+   }
   }
 
   function btnSaveClick() {

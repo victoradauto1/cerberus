@@ -21,6 +21,11 @@ export async function signUp(data: User) {
   return response.data;
 }
 
+export async function signOut(){
+  localStorage.clear();
+  window.location.href="/";
+}
+
 export async function activate(wallet: string, code: string): Promise<string> {
   if (!wallet || !code) return "";
 
@@ -28,10 +33,17 @@ export async function activate(wallet: string, code: string): Promise<string> {
   return response.data;
 }
 
-export function parseJWT(token: string): JWT{
+export function parseJwt(token: string): JWT{
     if(!token) throw new Error("Token is required");
 
     const base64str = token.split(".")[1];
     const base64 = base64str.replace("-", "+").replace("_", "/");
     return JSON.parse(window.atob(base64));
+}
+
+export function getJwt(): JWT | null{
+  const token = localStorage.getItem("token");
+  if(!token) return null;
+  return parseJwt(token);
+
 }

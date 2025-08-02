@@ -5,7 +5,7 @@ import { Status } from "commons/models/status";
 import { Plan } from "commons/models/plan";
 import { Contract } from "ethers";
 import ERC20_ABI from "commons/services/ERC20.json"
-import { Auth, signIn } from "./AuthService";
+import { Auth, parseJwt, signIn } from "./AuthService";
 
 function getProvider() {
   if (!window.ethereum) throw new Error("No Metamsk found!");
@@ -32,7 +32,6 @@ export async function doLogin(): Promise<JWT | undefined> {
   const signer = await provider.getSigner();
 
   const challenge = await signer.signMessage(message);
-  console.log(challenge);
 
   const token =  await signIn({
     secret: challenge,
@@ -41,14 +40,10 @@ export async function doLogin(): Promise<JWT | undefined> {
   } as Auth)
 
   localStorage.setItem("token", token);
+ console.log(token);
 
-  return {
-    address:"0x6e086E6f338Ed493196326d4Ade46fe02EDAeCB7",
-    name:"Victor",
-    planId: "Gold",
-    status: Status.ACTIVE,
-    userId: "12345"
-  } as JWT
+  return parseJwt(token);
+
 }
 export async function startPayment(plan: Plan): Promise<boolean>{
   const provider = getProvider();
