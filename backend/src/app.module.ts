@@ -1,13 +1,13 @@
+import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { MailerModule } from '@nestjs-modules/mailer';
+import { AuthService } from './auth/auth.service';
 import Config from './config';
 import { UserController } from './user/use.controller';
-import { UserService } from './user/use.service';
-import { AuthService } from './auth/auth.service';
-import { JwtService } from '@nestjs/jwt';
+import { UserService } from './user/user.service';
 
 @Module({
   imports: [

@@ -87,7 +87,7 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "ModuleNameMapper": {
+    "moduleNameMapper": {
       "commons/(.*)": "<rootDir>/../_commons_/$1"
     }
   }

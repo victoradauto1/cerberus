@@ -9,12 +9,11 @@ import { Status } from 'commons/models/status';
 import { User } from 'commons/models/user';
 import { decrypt, encrypt } from 'commons/services/cryptoService';
 import Config from '../config';
-import connect from '../db';
+import db from '../db';
 import { UserDTO } from './user.dto';
 @Injectable()
 export class UserService {
   async getUserByWallet(address: string): Promise<User> {
-    const db = await connect();
     const user = await db.users.findFirst({
       where: {
         address: {
@@ -36,7 +35,6 @@ export class UserService {
   }
 
   async getUserById(id: string): Promise<User> {
-    const db = await connect();
     const user = await db.users.findUnique({
       where: { id },
     });
@@ -61,7 +59,6 @@ export class UserService {
   }
 
   async addUser(user: UserDTO): Promise<User> {
-    const db = await connect();
 
     const oldUser = await db.users.findFirst({
       where: {
@@ -112,8 +109,6 @@ export class UserService {
     if (!user) throw new NotFoundException();
     if (user.status !== Status.BLOCKED) throw new ForbiddenException();
 
-    const db = await connect();
-
     // to do: pay via blockchain
 
     const updateUser = await db.users.update({
@@ -127,7 +122,6 @@ export class UserService {
   }
 
   async updateUser(id: string, user: UserDTO): Promise<User> {
-    const db = await connect();
 
     const data: any = {
       address: user.address,
@@ -164,7 +158,6 @@ export class UserService {
     if (user.activateDate < tenMinutesAgo)
       throw new UnauthorizedException(`activate code expired.`);
 
-    const db = await connect();
     const updatedUser = await db.users.update({
       where: { id: user.id },
       data: { status: Status.BLOCKED },

@@ -1,23 +1,22 @@
-import {
-  Controller,
-  Body,
-  Post,
-  Param,
-  BadRequestException,
-  UnauthorizedException,
-  NotFoundException,
-} from '@nestjs/common';
-import { AuthDTO } from './auth.dto';
-import { UserDTO } from '../user/user.dto';
-import { UserService } from '../user/use.service';
-import { User } from 'commons/models/user';
 import { MailerService } from '@nestjs-modules/mailer';
-import Config from '../config';
-import { AuthService } from './auth.service';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  NotFoundException,
+  Param,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JWT } from 'commons/models/jwt';
 import { Status } from 'commons/models/status';
-import { ethers, Wallet } from 'ethers';
-import { NotFoundError } from 'rxjs';
+import { User } from 'commons/models/user';
+import { ethers } from 'ethers';
+import Config from '../config';
+import { UserDTO } from '../user/user.dto';
+import { UserService } from '../user/user.service';
+import { AuthDTO } from './auth.dto';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
