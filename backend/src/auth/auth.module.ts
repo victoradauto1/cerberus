@@ -1,3 +1,5 @@
+/*istanbul ignore file */
+
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';

@@ -1,3 +1,5 @@
+/*istanbul ignore file */
+
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';

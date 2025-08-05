@@ -118,7 +118,7 @@ export class UserService {
 
     user.privateKey = '';
 
-    return user;
+    return updateUser;
   }
 
   async updateUser(id: string, user: UserDTO): Promise<User> {

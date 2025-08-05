@@ -14,3 +14,13 @@ export const newUserMock = {
   activateCode: '123456',
   activateDate: new Date(),
 } as users;
+
+export const blockedUserMock = {
+  ...newUserMock,
+  status: Status.BLOCKED
+}
+
+export const activeUserMock = {
+  ...newUserMock,
+  status: Status.ACTIVE
+}

@@ -1,3 +1,4 @@
+/*istanbul ignore file */
 import { CanActivate, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { ExecutionContext } from '@nestjs/common';

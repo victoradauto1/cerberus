@@ -70,18 +70,19 @@
       "json",
       "ts"
     ],
-    "rootDirs": [
-      "src",
-      "test"
-    ],
+    "rootDir": "./",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.(t|j)s",
+      "!src/**/*.module.ts",
+      "!src/**/*.dto.ts",
+      "!src/**/*.interface.ts",
+      "!src/**/*.mock.ts"
     ],
-    "coverPathIgnorePatterns": [
+    "coveragePathIgnorePatterns": [
       "node_modules",
       "test"
     ],
@@ -89,6 +90,9 @@
     "testEnvironment": "node",
     "moduleNameMapper": {
       "commons/(.*)": "<rootDir>/../_commons_/$1"
-    }
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/db.mock.ts"
+    ]
   }
 }

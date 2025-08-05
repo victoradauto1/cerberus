@@ -1,3 +1,5 @@
+/*istanbul ignore file */
+
 import { PrismaClient } from "commons/data";
 
 const prisma : PrismaClient = new PrismaClient();
