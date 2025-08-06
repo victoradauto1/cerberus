@@ -106,7 +106,6 @@ export class UserService {
 
   async payUSer(address: string): Promise<User> {
     const user = await this.getUserByWallet(address);
-    if (!user) throw new NotFoundException();
     if (user.status !== Status.BLOCKED) throw new ForbiddenException();
 
     // to do: pay via blockchain
@@ -138,15 +137,14 @@ export class UserService {
       data,
     });
 
-    updatedUser.privateKey = '';
+    if(updatedUser)
+      updatedUser.privateKey = '';
 
     return updatedUser;
   }
 
   async activateUser(wallet: string, code: string): Promise<User> {
     const user = await this.getUserByWallet(wallet);
-
-    if (!user) throw new NotFoundException();
 
     if (user.status !== Status.NEW) return user;
 
