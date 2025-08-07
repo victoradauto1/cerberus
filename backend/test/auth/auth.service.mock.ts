@@ -1,9 +1,9 @@
 import { JWT } from 'commons/models/jwt';
-import { AuthService } from '../../src/auth/auth.service';
 import { Status } from 'commons/models/status';
+import { AuthService } from '../../src/auth/auth.service';
 
 export const JwtMock = {
-  address: '0X123',
+  address: '0x123',
   name: 'Victor',
   planId: 'Gold',
   status: Status.ACTIVE,
@@ -15,6 +15,6 @@ export const authServiceMock = {
   useValue: {
     createToken: jest.fn().mockResolvedValue('abc123'),
     decodeToken: jest.fn().mockReturnValue(JwtMock),
-    checkToken: jest.fn().mockResolvedValue(true)
+    checkToken: jest.fn().mockResolvedValue(true),
   },
 };

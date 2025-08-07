@@ -8,7 +8,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
 import Config from './config';
-import { UserController } from './user/use.controller';
+import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 
 @Module({
