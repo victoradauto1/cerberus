@@ -104,7 +104,7 @@ export class UserService {
     });
   }
 
-  async payUSer(address: string): Promise<User> {
+  async payUser(address: string): Promise<User> {
     const user = await this.getUserByWallet(address);
     if (user.status !== Status.BLOCKED) throw new ForbiddenException();
 

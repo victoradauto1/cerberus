@@ -26,7 +26,7 @@ export class UserController {
   async pay(@Headers('Authorization') authorization) {
     const jwt = this.authService.decodeToken(authorization);
 
-    return this.userService.payUSer(jwt.address);
+    return this.userService.payUser(jwt.address);
   }
 
   @UseGuards(AuthGuard)
@@ -44,7 +44,7 @@ export class UserController {
         return this.userService.getUserByWallet(identifier);
       }
     } else {
-      if (jwt.address.toUpperCase() !== identifier.toUpperCase())
+      if (jwt.userId.toUpperCase() !== identifier.toUpperCase())
         throw new ForbiddenException();
       const user = await this.userService.getUserById(identifier);
       user.privateKey = '';

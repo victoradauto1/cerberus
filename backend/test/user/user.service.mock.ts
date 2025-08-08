@@ -26,10 +26,16 @@ export const activeUserMock = {
   status: Status.ACTIVE,
 };
 
+export const bannedUserMock = {
+  ...newUserMock,
+  status: Status.BANNED,
+};
+
 export const userServiceMock = {
   provide: UserService,
   useValue: {
     getUserByWallet: jest.fn().mockResolvedValue(activeUserMock),
+    getUserById: jest.fn().mockResolvedValue(activeUserMock),
     getUser: jest.fn().mockResolvedValue(activeUserMock),
     activateUser: jest.fn().mockResolvedValue(blockedUserMock),
     updateUser: jest.fn().mockResolvedValue(activeUserMock),

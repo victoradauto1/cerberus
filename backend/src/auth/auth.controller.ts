@@ -44,21 +44,18 @@ export class AuthController {
       throw new BadRequestException('Invalid secret.');
     }
 
-    if (wallet.toUpperCase() === data.wallet.toUpperCase()) {
-      const user = await this.userService.getUserByWallet(wallet);
-      if (!user) throw new NotFoundException('User not found. Signup first.');
-      if (user.status === Status.BANNED)
-        throw new UnauthorizedException('Banned user.');
-      return this.authService.createJwt({
-        userId: user.id,
-        address: user.address,
-        name: user.name,
-        planId: user.planId,
-        status: user.status,
-      } as JWT);
-    }
-
-    throw new UnauthorizedException("Wallet and secret doesn't match.");
+    if (wallet.toUpperCase() !== data.wallet.toUpperCase())
+      throw new UnauthorizedException("Wallet and secret doesn't match.");
+    const user = await this.userService.getUserByWallet(wallet);
+    if (user.status === Status.BANNED)
+      throw new UnauthorizedException('Banned user.');
+    return this.authService.createJwt({
+      userId: user.id,
+      address: user.address,
+      name: user.name,
+      planId: user.planId,
+      status: user.status,
+    } as JWT);
   }
 
   @Post('singup')

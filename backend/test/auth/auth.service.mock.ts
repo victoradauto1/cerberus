@@ -13,7 +13,7 @@ export const JwtMock = {
 export const authServiceMock = {
   provide: AuthService,
   useValue: {
-    createToken: jest.fn().mockResolvedValue('abc123'),
+    createJwt: jest.fn().mockResolvedValue('abc123'),
     decodeToken: jest.fn().mockReturnValue(JwtMock),
     checkToken: jest.fn().mockResolvedValue(true),
   },

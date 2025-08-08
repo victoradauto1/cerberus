@@ -110,7 +110,7 @@ describe('UserService tests', () => {
       ...blockedUserMock,
     } as users);
 
-    const result = await userService.payUSer(blockedUserMock.address);
+    const result = await userService.payUser(blockedUserMock.address);
     expect(result).toBeDefined();
     expect(result.status).toEqual(Status.ACTIVE);
   });
@@ -120,7 +120,7 @@ describe('UserService tests', () => {
       ...activeUserMock,
     } as users);
 
-    await expect(userService.payUSer(activeUserMock.address)).rejects.toEqual(
+    await expect(userService.payUser(activeUserMock.address)).rejects.toEqual(
       new ForbiddenException(),
     );
   });
