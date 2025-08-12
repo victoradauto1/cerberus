@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import Pool from 'commons/models/pool';
 import db from '../db';
 import { StatementResultingChanges } from 'node:sqlite';
@@ -10,15 +10,17 @@ type SymbolArr = Array<{ _id: string }>;
 
 @Injectable()
 export class PoolService {
-  async getPool(id: string): Promise<Pool | null> {
+  async getPool(id: string): Promise<Pool> {
     const pool = await db.pools.findUnique({
       where: { id },
     });
 
+    if (!pool) throw new NotFoundException();
+
     return pool;
   }
 
-  async searchPool(symbol: string, fee: number): Promise<Pool | null> {
+  async searchPool(symbol: string, fee: number): Promise<Pool> {
     const pool = await db.pools.findFirst({
       where: {
         symbol: {
@@ -28,6 +30,8 @@ export class PoolService {
         fee,
       },
     });
+
+    if (!pool) throw new NotFoundException();
 
     return pool;
   }
@@ -41,7 +45,7 @@ export class PoolService {
     return pools;
   }
 
-  async getPoolSymbol(): Promise<string[]> {
+  async getPoolSymbols(): Promise<string[]> {
     const symbols = (await db.pools.aggregateRaw({
       pipeline: [
         {
@@ -63,36 +67,40 @@ export class PoolService {
   async getTopPools(): Promise<Pool[]> {
     const oneHourAgo = new Date(Date.now() - 61 * 60 * 1000);
 
-    const top0Pools = await db.pools.findMany({
+    const top0Pools = (await db.pools.findMany({
       take: 5,
       where: {
         price0_60Change: { gt: 0 },
         price1_60Change: { lt: 0 },
         lastUpdate_60: { gt: oneHourAgo },
       },
-      orderBy: {price0_60Change: Prisma.SortOrder.desc}
-    }) as TopPool[];
+      orderBy: { price0_60Change: Prisma.SortOrder.desc },
+    })) as TopPool[];
 
-    top0Pools.forEach((v,i,a) => {
-        a[i].topChange = (v.price0_60Change || 0) + Math.abs((v.price1_60Change || 0));
-    })
+    top0Pools.forEach((v, i, a) => {
+      a[i].topChange =
+        (v.price0_60Change || 0) + Math.abs(v.price1_60Change || 0);
+    });
 
-     const top1Pools = await db.pools.findMany({
+    const top1Pools = (await db.pools.findMany({
       take: 5,
       where: {
         price1_60Change: { gt: 0 },
         price0_60Change: { lt: 0 },
         lastUpdate_60: { gt: oneHourAgo },
       },
-      orderBy: {price1_60Change: Prisma.SortOrder.desc}
-    }) as TopPool[];
+      orderBy: { price1_60Change: Prisma.SortOrder.desc },
+    })) as TopPool[];
 
-    top1Pools.forEach((v,i,a) => {
-        a[i].topChange = (v.price1_60Change || 0) + Math.abs((v.price0_60Change || 0));
-    })
+    top1Pools.forEach((v, i, a) => {
+      a[i].topChange =
+        (v.price1_60Change || 0) + Math.abs(v.price0_60Change || 0);
+    });
 
     const topPools = [...top0Pools, ...top1Pools];
-    const pools: Pool[] = topPools.sort((a,b)=> b.topChange - a.topChange).slice(0,5);
+    const pools: Pool[] = topPools
+      .sort((a, b) => b.topChange - a.topChange)
+      .slice(0, 5);
 
     return pools;
   }
