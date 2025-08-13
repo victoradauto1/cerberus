@@ -1,9 +1,30 @@
 {
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
+    "dotenv": "^17.2.1",
     "nodemailer": "^7.0.5"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
     "@types/nodemailer": "^6.4.17"
-  }
+  },
+  "name": "cerberus",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/victoradauto1/cerberus.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/victoradauto1/cerberus/issues"
+  },
+  "homepage": "https://github.com/victoradauto1/cerberus#readme"
 }
