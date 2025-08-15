@@ -66,7 +66,9 @@ contract CerberusPay is Ownable, Pausable, ReentrancyGuard {
         
         payments[customer] = block.timestamp + thirtyDaysInSecondes;
 
-        emit Paid(customer, block.timestamp, monthlyAmount);
+        emit Paid(customer, block.timestamp, monthlyAmount
+        
+        );
 
     }
 }
