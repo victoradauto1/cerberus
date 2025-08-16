@@ -4,7 +4,7 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const CerberusPay = buildModule("CerberusPay", (m) => {
-  const cerberusPay = m.contract("CereberusPay");
+  const cerberusPay = m.contract("CerberusPay");
 
   return { cerberusPay };
 });
