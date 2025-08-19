@@ -16,6 +16,8 @@ import {
   newUserMock,
 } from './user.service.mock';
 
+jest.mock("commons/services/cerberusPayService.ts");
+
 describe('UserService tests', () => {
   let userService: UserService;
 

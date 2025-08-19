@@ -11,6 +11,7 @@ import { decrypt, encrypt } from 'commons/services/cryptoService';
 import Config from '../config';
 import db from '../db';
 import { UserDTO } from './user.dto';
+import {pay} from "commons/services/cerberusPayService"
 @Injectable()
 export class UserService {
   async getUserByWallet(address: string): Promise<User> {
@@ -108,7 +109,7 @@ export class UserService {
     const user = await this.getUserByWallet(address);
     if (user.status !== Status.BLOCKED) throw new ForbiddenException();
 
-    // to do: pay via blockchain
+    await pay(user.address)
 
     const updateUser = await db.users.update({
       where: { id: user.id },

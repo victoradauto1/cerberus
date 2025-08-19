@@ -6,6 +6,8 @@ export default class Config extends ConfigBase{
 
   
 static MONITOR_INTERVAL: number = parseInt(`${process.env.INTERVAL}`);
+static CHARGE_INTERVAL: number = parseInt(`${process.env.INTERVAL}`);
+
 static NETWORK: string = `${process.env.NETWORK}`;
 
 static getNetwork(network: string): ChainId{
