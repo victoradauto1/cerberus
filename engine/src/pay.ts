@@ -1,5 +1,8 @@
 import Config from "./config";
 import {getCustomerNextPayment, getCustomers, pay} from "commons/services/cerberusPayService"
+import usersRepository from "./repositories/usersRepository";
+import { Status } from "commons/models/status";
+import sendMail from "./services/"
 
 async function executionCylce() {
     console.log("Executing the payment cycle...");
@@ -17,7 +20,10 @@ async function executionCylce() {
         try {
           await pay(customerAddress);
         } catch (error) {
-          const user = await userRepository.
+          const user = await usersRepository.updateUserStatus(customerAddress, Status.BLOCKED);
+          if(!user) continue;
+
+          await sendmail
         }
     }
 
