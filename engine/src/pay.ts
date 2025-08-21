@@ -2,7 +2,7 @@ import Config from "./config";
 import {getCustomerNextPayment, getCustomers, pay} from "commons/services/cerberusPayService"
 import usersRepository from "./repositories/usersRepository";
 import { Status } from "commons/models/status";
-import sendMail from "./services/"
+import sendMail from "./services/mailService"
 
 async function executionCylce() {
     console.log("Executing the payment cycle...");
@@ -23,7 +23,19 @@ async function executionCylce() {
           const user = await usersRepository.updateUserStatus(customerAddress, Status.BLOCKED);
           if(!user) continue;
 
-          await sendmail
+          await sendMail(user.email, "Cerberus account blocked", `
+            Hi, ${user.name}
+            
+            your account was blocked due to insufficient balance or allawance. Please, click in the link below (or copy-paste in the browser) to update your paument info:
+
+            ${Config.SITE_URL}/pay/${user.address}
+
+            See ya!
+
+            Admin
+            `);
+
+            // to do: bloquear as automações
         }
     }
 
