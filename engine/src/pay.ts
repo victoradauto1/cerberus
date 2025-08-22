@@ -18,6 +18,7 @@ async function executionCylce() {
         if(nextPayment > (Date.now()/1000)) continue;
 
         try {
+          console.log("Chrging customer "+ customerAddress)
           await pay(customerAddress);
         } catch (error) {
           const user = await usersRepository.updateUserStatus(customerAddress, Status.BLOCKED);

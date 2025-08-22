@@ -30,7 +30,7 @@ static getExchange(exchange: string): Exchange{
 }
 
 static EXCHANGE2: Exchange = Config.getExchange(`${Config.EXCHANGE}`)
-static UNISWAP_GRAPH_URL: string = `${process.env.UNISWAP_GRAPH_URL}`;
+
 static POOL_COUNT: number = parseInt(`${process.env.POOL_COUNT}`);
 static WS_PORT: number = parseInt(`${process.env.WS_PORT}`);
 }

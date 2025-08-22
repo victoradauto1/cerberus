@@ -1,9 +1,9 @@
-import connect from "./db";
-import Pool from "commons/models/pool";
 import { ChainId } from "commons/models/chainId";
 import { Exchange } from "commons/models/exchange";
-import { PoolData } from "../services/uniswapTypes";
+import Pool from "commons/models/pool";
+import { PoolData } from "../../services/uniswapTypes";
 import Config from "../config";
+import connect from "./db";
 
 async function countPools(
   exchange: Exchange,
@@ -25,7 +25,7 @@ async function getPool(id: string): Promise<Pool | null> {
     where: { id },
   });
 
-  return  pool;
+  return pool;
 }
 
 async function addPool(pool: Pool): Promise<Pool> {
@@ -38,45 +38,49 @@ async function addPool(pool: Pool): Promise<Pool> {
   return newPool;
 }
 
-function buildSet(newprice: number, pool: any, tokenNumber: string, minutes: number){
+function buildSet(
+  newprice: number,
+  pool: any,
+  tokenNumber: string,
+  minutes: number
+) {
   const setObj: any = {};
-  const xMinutesAgo = new Date( new Date().getTime() - (minutes * 60 * 1000));
+  const xMinutesAgo = new Date(new Date().getTime() - minutes * 60 * 1000);
 
-  if(pool[`update_${minutes}`] <= xMinutesAgo){
+  if (pool[`update_${minutes}`] <= xMinutesAgo) {
     const oldPriceX = Number(pool[`price${tokenNumber}_${minutes}`]);
     const priceChangeX = ((newprice - oldPriceX) / oldPriceX) * 100;
 
-    setObj[`price${tokenNumber}_${minutes}`] = `${newprice}`;
-    setObj[`price${tokenNumber}Change_${minutes}`] = priceChangeX && Number.isFinite(priceChangeX)? priceChangeX : 0;
+    setObj[`price${tokenNumber}_${minutes}`] = newprice;
+    setObj[`price${tokenNumber}Change_${minutes}`] =
+      priceChangeX && Number.isFinite(priceChangeX) ? priceChangeX : 0;
     setObj[`lastUpdate_${minutes}`] = new Date();
 
     return setObj;
-
   }
 }
 
-function builSetFull(pool: Pool, newPrice: number, tokenNumber: string){
-    if(!["0", "1"].includes(tokenNumber)){
-      throw new Error(`Token number must be 0 or 1.`);
-    } 
+function builSetFull(pool: Pool, newPrice: number, tokenNumber: string) {
+  if (!["0", "1"].includes(tokenNumber)) {
+    throw new Error(`Token number must be 0 or 1.`);
+  }
 
-    const oldPrice = Number(tokenNumber == "0"?  pool.price0 : pool.price1);
-    const priceChange = ((newPrice - oldPrice) / oldPrice) * 100;
+  const oldPrice = Number(tokenNumber == "0" ? pool.price0 : pool.price1);
+  const priceChange = ((newPrice - oldPrice) / oldPrice) * 100;
 
-    const setObj: any = [];
-    setObj[`price${tokenNumber}`] = `${newPrice}`;
-    setObj[`price${tokenNumber}Change`] = priceChange && Number.isFinite(priceChange)? priceChange : 0;
-    setObj[`lastUpdate`] = new Date();
+  const setObj: any = [];
+  setObj[`price${tokenNumber}`] = newPrice;
+  setObj[`price${tokenNumber}Change`] =
+    priceChange && Number.isFinite(priceChange) ? priceChange : 0;
+  setObj[`lastUpdate`] = new Date();
 
-    
-    const setObj_15 = buildSet(newPrice, pool, tokenNumber, 15);
-    const setObj_60 = buildSet(newPrice, pool, tokenNumber, 60);
+  const setObj_15 = buildSet(newPrice, pool, tokenNumber, 15);
+  const setObj_60 = buildSet(newPrice, pool, tokenNumber, 60);
 
-    return {...setObj, ...setObj_15, ...setObj_60};
+  return { ...setObj, ...setObj_15, ...setObj_60 };
 }
 
 async function updatePrices(poolData: PoolData): Promise<Pool | null> {
-  
   let pool = await getPool(poolData.id);
   if (!pool) {
     pool = new Pool({
@@ -99,11 +103,11 @@ async function updatePrices(poolData: PoolData): Promise<Pool | null> {
 
   const setObj0 = builSetFull(pool, newPrice0, "0");
   const setObj1 = builSetFull(pool, newPrice1, "1");
-   
+
   const db = await connect();
   await db.pools.update({
     where: { id: poolData.id },
-    data: {...setObj0, ...setObj1 },
+    data: { ...setObj0, ...setObj1 },
   });
 
   return getPool(poolData.id);
