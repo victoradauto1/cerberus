@@ -12,6 +12,13 @@ const config: HardhatUserConfig = {
       chainId: parseInt(`${process.env.CHAIN_ID}`) || 80002,
       accounts: { mnemonic: process.env.SECRET }, 
     },
+    local:{
+      chainId: 31337,
+      url: "http://127.0.0.1:8545",
+      accounts:{
+        mnemonic:"test test test test test test test test test test test junk"
+      }
+    }
   },
   etherscan: {
     apiKey: {
