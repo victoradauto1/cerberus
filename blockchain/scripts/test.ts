@@ -1,6 +1,6 @@
 // scripts/deposit.ts
 import { ethers } from "hardhat";
-const ABI_MATIC = require("../abi.wmatic.json");
+const ABI_MATIC = require("./abi.wmatic.json");
 const WMATIC_MAINNET = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
 
 async function main() {

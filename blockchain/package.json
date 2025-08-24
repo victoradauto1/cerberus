@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
-    "node": "npx hardhat node --fork https://polygon-rpc.com"
+    "node": "npx hardhat node --fork https://polygon-rpc.com",
+    "deploy:test": "npx hardhat run scripts/test.ts --network local"
   },
   "keywords": [],
   "author": "",
