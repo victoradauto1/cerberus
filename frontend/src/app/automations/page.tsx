@@ -3,8 +3,16 @@
 import FooterAdmin from "@/components/Footers/FooterAdmin";
 import AdminNavbar from "@/components/Navbars/AdminNavbar";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import { useRouter } from "next/navigation";
 
 export default function Automations() {
+
+  const {push} = useRouter();
+
+  function btnNewAutomationClick(){
+    push("/automations/new")
+  }
+
   return (
     <>
       <Sidebar />
@@ -25,6 +33,7 @@ export default function Automations() {
                       <button
                         className="bg-blueGray-700 active:bg-blueGray-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150 absoute right-0"
                         type="button"
+                        onClick={btnNewAutomationClick}
                       >
                         New Automation
                       </button>
