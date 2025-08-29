@@ -9,8 +9,10 @@ import { ChainId } from "commons/models/chainId";
 import { Exchange } from "commons/models/exchange";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import RadioGroup from "@/components/RadioGroup";
+import PoolInput from "./PoolInput";
 
-export default function Settings() {
+export default function newAutomation() {
   const { push } = useRouter();
 
   const queryString = useSearchParams();
@@ -48,6 +50,7 @@ export default function Settings() {
     )
       setError("");
     setIsLoading(true);
+    alert(JSON.stringify(automation));
     //slavar a automação
   }
 
@@ -102,11 +105,18 @@ export default function Settings() {
                       </div>
                     </div>
 
+                    <RadioGroup id="isActive" textOn="Automation On" textOff="Automation Off" isOn={automation.isActive} onChange={onAutomationChange}/>
+                    <div className="mt-3">
+                      <RadioGroup id="isOpened" textOn="Is Opened" textOff="Is Closed" isOn={automation.isOpened} onChange={onAutomationChange}/>
+                    </div>
+
                     <hr className="mt-6 border-b-1 border-blueGray-300" />
 
                     <h6 className="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
                       Pool
                     </h6>
+
+                    <PoolInput poolId={automation.poolId} onError={setError} onChange={onPoolChange} />
 
                     <hr className="mt-6 border-b-1 border-blueGray-300" />
 
