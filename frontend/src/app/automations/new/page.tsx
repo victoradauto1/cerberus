@@ -11,6 +11,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import RadioGroup from "@/components/RadioGroup";
 import PoolInput from "./PoolInput";
+import Pool from "commons/models/pool";
+
 
 export default function newAutomation() {
   const { push } = useRouter();
@@ -28,6 +30,7 @@ export default function newAutomation() {
 
   const [automation, setAutomation] = useState<Automation>(DEFAULT_AUTOMATION);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [pool, setPool]= useState<Pool>({} as Pool);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
@@ -43,6 +46,17 @@ export default function newAutomation() {
   }
 
   function btnSaveClick() {
+
+    if(!automation.name){
+      setError("The automation name is required.");
+      return;
+    }
+
+    if(!automation.poolId){
+      setError("The automation pool is required.");
+      return;
+    }
+
     if (
       !confirm(
         "This action will use some wey ( 'aprove' function). Are you sure?"
@@ -52,6 +66,11 @@ export default function newAutomation() {
     setIsLoading(true);
     alert(JSON.stringify(automation));
     //slavar a automação
+  }
+
+  function onPoolChange(pool: Pool | null){
+   setAutomation((prevState: any)=>({...prevState, poolId: pool? pool.id : null}));
+   setPool(pool || {} as Pool);
   }
 
   return (
