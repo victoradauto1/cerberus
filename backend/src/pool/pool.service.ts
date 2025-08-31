@@ -20,20 +20,19 @@ export class PoolService {
     return pool;
   }
 
-  async searchPool(symbol: string, fee: number): Promise<Pool> {
-    const pool = await db.pools.findFirst({
+  async searchPool(symbol: string): Promise<Pool[]> {
+    const pools = await db.pools.findMany({
       where: {
         symbol: {
           equals: symbol,
           mode: 'insensitive',
-        },
-        fee,
+        }
       },
     });
 
-    if (!pool) throw new NotFoundException();
+    if (!pools) throw new NotFoundException();
 
-    return pool;
+    return pools;
   }
 
   async getPools(page: number = 1, pageSize: number = 20): Promise<Pool[]> {

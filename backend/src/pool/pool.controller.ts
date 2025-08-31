@@ -35,15 +35,14 @@ export class PoolController {
   }
 
   @UseGuards(AuthGuard)
-  @Get(':symbol/:fee')
+  @Get('search/:symbol/')
   async searchPool(
     @Param('symbol') symbol: string,
-    @Param('fee', ParseIntPipe) fee: number,
   ) {
-    const pool = await this.poolService.searchPool(symbol, fee);
-    if (!pool) throw new NotFoundException();
+    const pools = await this.poolService.searchPool(symbol);
+    if (!pools) throw new NotFoundException();
 
-    return pool;
+    return pools;
   }
 
   @UseGuards(AuthGuard)
