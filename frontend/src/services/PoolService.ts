@@ -26,7 +26,7 @@ export async function getPoolSymbols(): Promise<string[]>{
 
 
 export async function getPools(page: number = 1, pageSize: number = 20): Promise<Pool[]>{
-    const response = await axios.get(`${BACKEND_URL}/?page=${page}$pageSize=${pageSize}`);
+    const response = await axios.get(`${BACKEND_URL}/?page=${page}&pageSize=${pageSize}`);
     return response.data;
 }
 

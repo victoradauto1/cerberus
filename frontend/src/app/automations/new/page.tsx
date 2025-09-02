@@ -3,16 +3,17 @@
 import Alert from "@/components/Alert";
 import FooterAdmin from "@/components/Footers/FooterAdmin";
 import AdminNavbar from "@/components/Navbars/AdminNavbar";
+import RadioGroup from "@/components/RadioGroup";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import Automation from "commons/models/automation";
+import { addAutomation, updateAutomation } from "@/services/AutomationService";
+import Automation, { Condition } from "commons/models/automation";
 import { ChainId } from "commons/models/chainId";
 import { Exchange } from "commons/models/exchange";
+import Pool from "commons/models/pool";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import RadioGroup from "@/components/RadioGroup";
+import ConditionInput from "./ConditionInput";
 import PoolInput from "./PoolInput";
-import Pool from "commons/models/pool";
-
 
 export default function newAutomation() {
   const { push } = useRouter();
@@ -30,7 +31,7 @@ export default function newAutomation() {
 
   const [automation, setAutomation] = useState<Automation>(DEFAULT_AUTOMATION);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [pool, setPool]= useState<Pool>({} as Pool);
+  const [pool, setPool] = useState<Pool>({} as Pool);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
@@ -46,13 +47,12 @@ export default function newAutomation() {
   }
 
   function btnSaveClick() {
-
-    if(!automation.name){
+    if (!automation.name) {
       setError("The automation name is required.");
       return;
     }
 
-    if(!automation.poolId){
+    if (!automation.poolId) {
       setError("The automation pool is required.");
       return;
     }
@@ -64,13 +64,40 @@ export default function newAutomation() {
     )
       setError("");
     setIsLoading(true);
-    alert(JSON.stringify(automation));
-    //slavar a automação
+
+    let promise: Promise<Automation>;
+
+    if (automationId) promise = updateAutomation(automationId, automation);
+    else promise = addAutomation(automation);
+
+    promise
+      .then(automation => push("/automatios"))
+      .catch(err=> {
+        setIsLoading(false);
+        setError(err.response? JSON.stringify(err.response.data) : err.message)
+      })
   }
 
-  function onPoolChange(pool: Pool | null){
-   setAutomation((prevState: any)=>({...prevState, poolId: pool? pool.id : null}));
-   setPool(pool || {} as Pool);
+  function onPoolChange(pool: Pool | null) {
+    setAutomation((prevState: any) => ({
+      ...prevState,
+      poolId: pool ? pool.id : null,
+    }));
+    setPool(pool || ({} as Pool));
+  }
+
+  function onOpenConditionChange(condition: Condition) {
+    setAutomation((prevState: any) => ({
+      ...prevState,
+      openCondition: condition,
+    }));
+  }
+
+  function onCloseConditionChange(condition: Condition) {
+    setAutomation((prevState: any) => ({
+      ...prevState,
+      closeCondition: condition,
+    }));
   }
 
   return (
@@ -124,9 +151,21 @@ export default function newAutomation() {
                       </div>
                     </div>
 
-                    <RadioGroup id="isActive" textOn="Automation On" textOff="Automation Off" isOn={automation.isActive} onChange={onAutomationChange}/>
+                    <RadioGroup
+                      id="isActive"
+                      textOn="Automation On"
+                      textOff="Automation Off"
+                      isOn={automation.isActive}
+                      onChange={onAutomationChange}
+                    />
                     <div className="mt-3">
-                      <RadioGroup id="isOpened" textOn="Is Opened" textOff="Is Closed" isOn={automation.isOpened} onChange={onAutomationChange}/>
+                      <RadioGroup
+                        id="isOpened"
+                        textOn="Is Opened"
+                        textOff="Is Closed"
+                        isOn={automation.isOpened}
+                        onChange={onAutomationChange}
+                      />
                     </div>
 
                     <hr className="mt-6 border-b-1 border-blueGray-300" />
@@ -135,20 +174,40 @@ export default function newAutomation() {
                       Pool
                     </h6>
 
-                    <PoolInput poolId={automation.poolId} onError={setError} onChange={onPoolChange} />
+                    <PoolInput
+                      poolId={automation.poolId}
+                      onError={setError}
+                      onChange={onPoolChange}
+                    />
 
                     <hr className="mt-6 border-b-1 border-blueGray-300" />
 
                     <h6 className="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
                       Strategy
                     </h6>
-                    <div className="w-full lg:w-6/12 px-4">
+
+                    <ConditionInput
+                      id="openCondition"
+                      title="Open Condition"
+                      symbol0={pool.symbol0}
+                      symbol1={pool.symbol1}
+                      condition={automation.openCondition}
+                      onChange={onOpenConditionChange}
+                    />
+
+                    <div className="w-full lg:w-3/12 px-4">
                       <div className="relative w-full mb-3">
                         <label
                           className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
                           htmlFor="nextAmount"
                         >
-                          Trade Amount
+                          Trade Amount (
+                          {automation.isOpened
+                            ? `${pool.symbol0 || "symbol0"} to sell`
+                            : `${pool.symbol1 || "symbol1"} to buy ${
+                                pool.symbol0 || "symbol0"
+                              }`}
+                          )
                         </label>
                         <input
                           type="text"
@@ -159,6 +218,14 @@ export default function newAutomation() {
                         />
                       </div>
                     </div>
+                    <ConditionInput
+                      id="closeCondition"
+                      title="Close Condition"
+                      symbol0={pool.symbol0}
+                      symbol1={pool.symbol1}
+                      condition={automation.closeCondition}
+                      onChange={onCloseConditionChange}
+                    />
                   </form>
                 </div>
               </div>
