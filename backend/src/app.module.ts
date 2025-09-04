@@ -12,6 +12,8 @@ import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { PoolController } from './pool/pool.controller'
 import { PoolService } from './pool/pool.service';
+import { AuthController } from './auth/auth.controller';
+import { AutomationService } from './automation/automation.service';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { PoolService } from './pool/pool.service';
     }),
     AuthModule,
   ],
-  controllers: [AppController, UserController, PoolController],
-  providers: [AppService, UserService, AuthService, JwtService, PoolService],
+  controllers: [AppController, UserController, PoolController, AuthController],
+  providers: [AppService, UserService, AuthService, JwtService, PoolService, AutomationService],
 })
 export class AppModule {}

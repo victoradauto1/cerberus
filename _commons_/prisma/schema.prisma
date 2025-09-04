@@ -27,6 +27,9 @@ model users {
   privateKey String
   activateCode String
   activateDate DateTime
+  automations automations[]
+
+  @@index([email])
 }
 
 model pools {
@@ -57,4 +60,26 @@ model pools {
   price1_15Change  Float?
   price1_60        Float?
   price1_60Change  Float?
+  automations automations[] @ignore
+}
+
+type Condition{
+  field String
+  operator String
+  value String  
+}
+model automations{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user users @relation(fields: [userId], references: [id])
+  exchange Int @default(1)
+  network Int @default(1)
+  name String
+  poolId String?
+  pool pools? @relation(fields: [poolId], references: [id])
+  openCondition Condition
+  closeCondition Condition?
+  isOpened Boolean @default(false)
+  isActive Boolean @default(false)
+  nextAmount String
 }
