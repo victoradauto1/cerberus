@@ -5,7 +5,7 @@ import FooterAdmin from "@/components/Footers/FooterAdmin";
 import AdminNavbar from "@/components/Navbars/AdminNavbar";
 import RadioGroup from "@/components/RadioGroup";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import { addAutomation, updateAutomation } from "@/services/AutomationService";
+import { addAutomation, updateAutomation, getAutomation } from "@/services/AutomationService";
 import Automation, { Condition } from "commons/models/automation";
 import { ChainId } from "commons/models/chainId";
 import { Exchange } from "commons/models/exchange";
@@ -36,7 +36,12 @@ export default function newAutomation() {
 
   useEffect(() => {
     if (!automationId) return;
-    //carregar a automação
+    
+    getAutomation(automationId)
+      .then(automation => setAutomation(automation))
+      .catch(err => setError(err.response? JSON.stringify(err.response.data): err.message))
+
+
   }, [automationId]);
 
   function onAutomationChange(evt: React.ChangeEvent<HTMLInputElement>) {
