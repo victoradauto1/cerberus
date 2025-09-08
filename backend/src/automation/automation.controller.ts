@@ -99,4 +99,60 @@ export class AutomationController {
      const jwt = this.authService.decodeToken(authorization);
      return this.automationService.getAutomation(id, jwt.userId);
   }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/start')
+  async startAutomation(
+    @Param('id') id: string,
+    @Headers('Authorization') authorization: string,
+  ) {
+    const jwt = this.authService.decodeToken(authorization);
+    const user = await this.userService.getUserById(jwt.userId);
+    if (!user.privateKey)
+      throw new Error(
+        'You must have a private key is settings before you update a automation.',
+      );
+
+    const automation = await this.automationService.startAutomation(
+      id,
+      jwt.userId
+    );
+
+    if (!automation.poolId) return automation;
+
+    const condition = automation.isOpened
+      ? automation.closeCondition
+      : automation.openCondition;
+
+    if (!condition) return automation;
+
+    const pool = await this.poolService.getPool(automation.poolId);
+    const tokenAddress =
+      condition.field.indexOf('price0') !== -1 ? pool.token1 : pool.token0;
+
+    //pegar a allownce
+    //pre aprovação do swap
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/stop')
+  async stopAutomation(
+    @Param('id') id: string,
+    @Headers('Authorization') authorization: string,
+  ) {
+    const jwt = this.authService.decodeToken(authorization);
+
+    return this.automationService.stopAutomation(id, jwt.userId)
+  }
+
+   @UseGuards(AuthGuard)
+  @Post(':id')
+  async deleteAutomation(
+    @Param('id') id: string,
+    @Headers('Authorization') authorization: string,
+  ) {
+    const jwt = this.authService.decodeToken(authorization);
+
+    return this.automationService.deleteAutomation(id, jwt.userId)
+  }
 }
