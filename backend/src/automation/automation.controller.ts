@@ -1,11 +1,14 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -23,6 +26,7 @@ export class AutomationController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
+
   @UseGuards(AuthGuard)
   @Post('')
   async addAutomation(
@@ -49,8 +53,6 @@ export class AutomationController {
       if (!condition) return response;
       const tokenAddress =
         condition.field.indexOf('price0') !== -1 ? pool.token1 : pool.token0;
-
-      //pre aprovação do swap
     }
 
     return response;
@@ -88,16 +90,16 @@ export class AutomationController {
     const pool = await this.poolService.getPool(automation.poolId);
     const tokenAddress =
       condition.field.indexOf('price0') !== -1 ? pool.token1 : pool.token0;
-
-    //pegar a allownce
-    //pre aprovação do swap
   }
 
   @UseGuards(AuthGuard)
-  @Get(':id')
-  async getAutomation(@Param("id") id: string,@Headers('Authorization') authorization: string ){
-     const jwt = this.authService.decodeToken(authorization);
-     return this.automationService.getAutomation(id, jwt.userId);
+  @Get(':id/active')
+  async getActiveAutomation(
+    @Param('id') id: string,
+    @Headers('Authorization') authorization: string,
+  ) {
+    const jwt = this.authService.decodeToken(authorization);
+    return this.automationService.getActiveAutomations(jwt.userId);
   }
 
   @UseGuards(AuthGuard)
@@ -115,7 +117,7 @@ export class AutomationController {
 
     const automation = await this.automationService.startAutomation(
       id,
-      jwt.userId
+      jwt.userId,
     );
 
     if (!automation.poolId) return automation;
@@ -129,9 +131,6 @@ export class AutomationController {
     const pool = await this.poolService.getPool(automation.poolId);
     const tokenAddress =
       condition.field.indexOf('price0') !== -1 ? pool.token1 : pool.token0;
-
-    //pegar a allownce
-    //pre aprovação do swap
   }
 
   @UseGuards(AuthGuard)
@@ -142,17 +141,38 @@ export class AutomationController {
   ) {
     const jwt = this.authService.decodeToken(authorization);
 
-    return this.automationService.stopAutomation(id, jwt.userId)
+    return this.automationService.stopAutomation(id, jwt.userId);
   }
 
-   @UseGuards(AuthGuard)
-  @Post(':id')
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  async getAutomation(
+    @Param('id') id: string,
+    @Headers('Authorization') authorization: string,
+  ) {
+    const jwt = this.authService.decodeToken(authorization);
+    return this.automationService.getAutomation(id, jwt.userId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':id')
   async deleteAutomation(
     @Param('id') id: string,
     @Headers('Authorization') authorization: string,
   ) {
     const jwt = this.authService.decodeToken(authorization);
 
-    return this.automationService.deleteAutomation(id, jwt.userId)
+    return this.automationService.deleteAutomation(id, jwt.userId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('')
+  async getAutomations(
+    @Headers('Authorization') authorization: string,
+    @Query('page', ParseIntPipe) page?: number,
+    @Query('pageSize', ParseIntPipe) pageSize?: number,
+  ) {
+    const jwt = this.authService.decodeToken(authorization);
+    return this.automationService.getAutomations(jwt.userId, page, pageSize);
   }
 }
