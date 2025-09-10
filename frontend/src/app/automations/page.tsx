@@ -4,14 +4,26 @@ import FooterAdmin from "@/components/Footers/FooterAdmin";
 import AdminNavbar from "@/components/Navbars/AdminNavbar";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { useRouter } from "next/navigation";
+import AutomationRow from "./AutomationRow";
+import { useEffect, useState } from "react";
+import Automation from "commons/models/automation";
+import { getAutomations } from "@/services/AutomationService";
 
 export default function Automations() {
 
+  const [automations, setAutomations] = useState<Automation[]>();
+  const [ reload, setReload] = useState<number>(0);
   const {push} = useRouter();
 
   function btnNewAutomationClick(){
     push("/automations/new")
   }
+
+  useEffect(()=>{
+    getAutomations(1, 100)
+      .then(automations => setAutomations(automations))
+      .catch(err=> alert(err.response? JSON.stringify(err.response.data): err.message))
+  },[reload])
 
   return (
     <>
@@ -76,81 +88,15 @@ export default function Automations() {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"></td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <i className="fas fa-circle text-green-500 mr-2"></i>{" "}
-                          READY TO BUY
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <i className="fas fa-circle text-green-500 mr-2"></i>{" "}
-                          RUNNING
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button type="button" className="fas fa-play mr-3">
-                            <i />
-                          </button>
-                          <button type="button" className="fas fa-stop mr-3">
-                            <i />
-                          </button>
-                          <button type="button" className="fas fa-pencil mr-3">
-                            <i />
-                          </button>
-                          <button type="button" className="fas fa-trash mr-3">
-                            <i />
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"></td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <i className="fas fa-circle text-green-500 mr-2"></i>{" "}
-                          READY TO BUY
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <i className="fas fa-circle text-green-500 mr-2"></i>{" "}
-                          RUNNING
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button type="button" className="fas fa-play mr-3">
-                            <i />
-                          </button>
-                          <button type="button" className="fas fa-stop mr-3">
-                            <i />
-                          </button>
-                          <button type="button" className="fas fa-pencil mr-3">
-                            <i />
-                          </button>
-                          <button type="button" className="fas fa-trash mr-3">
-                            <i />
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"></td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <i className="fas fa-circle text-green-500 mr-2"></i>{" "}
-                          READY TO BUY
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <i className="fas fa-circle text-green-500 mr-2"></i>{" "}
-                          RUNNING
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button type="button" className="fas fa-play mr-3">
-                            <i />
-                          </button>
-                          <button type="button" className="fas fa-stop mr-3">
-                            <i />
-                          </button>
-                          <button type="button" className="fas fa-pencil mr-3">
-                            <i />
-                          </button>
-                          <button type="button" className="fas fa-trash mr-3">
-                            <i />
-                          </button>
-                        </td>
-                      </tr>
+                      {automations && automations.length?
+                      automations.map(a=> <AutomationRow data={a} onUpdate={()=> setReload(Date.now())} />)
+                    : 
+                    (<tr>
+                      <td colSpan={4} className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                        0 automations found. Create one first.
+                      </td>
+                    </tr>)
+                    }
                     </tbody>
                   </table>
                 </div>
