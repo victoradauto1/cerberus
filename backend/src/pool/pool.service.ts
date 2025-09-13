@@ -30,7 +30,7 @@ export class PoolService {
       },
     });
 
-    if (!pools) throw new NotFoundException();
+    if (!pools || pools.length === 0) throw new NotFoundException();
 
     return pools;
   }
