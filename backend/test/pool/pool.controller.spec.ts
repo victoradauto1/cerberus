@@ -62,5 +62,6 @@ describe('PoolService tests', () => {
     expect(symbols.length).toEqual(1);
     expect(symbols[0]).toEqual(poolMock.symbol);
   });
-
+  
+  
 })
