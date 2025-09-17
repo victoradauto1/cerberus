@@ -23,3 +23,13 @@ export const newAutomationMock = {
     value: '0',
   },
 } as Automation;
+
+export const activeAutomationMock = {
+  ...newAutomationMock,
+  isActive: true
+} as Automation;
+
+export const InactiveAutomationMock = {
+  ...newAutomationMock,
+  isActive: false
+} as Automation;
