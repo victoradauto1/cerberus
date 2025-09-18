@@ -1,6 +1,7 @@
 import Automation from 'commons/models/automation';
 import { ChainId } from 'commons/models/chainId';
 import { Exchange } from 'commons/models/exchange';
+import { AutomationService } from '../../src/automation/automation.service';
 
 export const newAutomationMock = {
   id: 'automation123',
@@ -26,10 +27,24 @@ export const newAutomationMock = {
 
 export const activeAutomationMock = {
   ...newAutomationMock,
-  isActive: true
+  isActive: true,
 } as Automation;
 
 export const InactiveAutomationMock = {
   ...newAutomationMock,
-  isActive: false
+  isActive: false,
 } as Automation;
+
+export const automationServiceMock = {
+  provide: AutomationService,
+  useValue: {
+    getAutomation: jest.fn().mockResolvedValue(activeAutomationMock),
+    getAutomations: jest.fn().mockResolvedValue([activeAutomationMock]),
+    getActiveAutomations: jest.fn().mockResolvedValue([activeAutomationMock]),
+    addAutomnation: jest.fn().mockResolvedValue(activeAutomationMock),
+    updateAutomation: jest.fn().mockResolvedValue(activeAutomationMock),
+    deleteAutomation: jest.fn().mockResolvedValue(activeAutomationMock),
+    startAutomation: jest.fn().mockResolvedValue(activeAutomationMock),
+    stopAutomation: jest.fn().mockResolvedValue(InactiveAutomationMock),
+  },
+};

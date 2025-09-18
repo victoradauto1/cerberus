@@ -4,7 +4,7 @@ import { poolMock, poolServiceMock } from "./pool.service.mock";
 import { authServiceMock } from "../../test/auth/auth.service.mock";
 import { NotFoundException } from "@nestjs/common";
 
-describe('PoolService tests', () => {
+describe('PoolController tests', () => {
   let poolController: PoolController;
 
   beforeAll(async () => {
