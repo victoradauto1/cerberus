@@ -1,74 +1,74 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { PoolController } from "../../src/pool/pool.controller";
-import { poolMock, poolServiceMock } from "./pool.service.mock";
+import { newAutomationMock, poolServiceMock } from "../pool/pool.service.mock";
 import { authServiceMock } from "../../test/auth/auth.service.mock";
 import { NotFoundException } from "@nestjs/common";
 import { AutomationController } from "../../src/automation/automation.controller";
-import { AuthService } from "src/auth/auth.service";
+
+import { automationServiceMock, newAutomationMock } from "./automation.service.mock";
+
+import { userServiceMock } from "test/user/user.service.mock";
 
 describe('AutomationController tests', () => {
+
+  const authorization = "authorization";
   let automationController: AutomationController;
 
   beforeAll(async () => {
-
-    private readonly automationService: AutomationService,
-        private readonly poolService: PoolService,
-        private readonly userService: UserService,
-        private readonly authService: AuthService
         
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      providers: [AutomationController],
-      controllers: [AutomationController]
+      controllers: [AutomationController],
+      providers: [automationServiceMock, poolServiceMock, userServiceMock, authServiceMock],
+      
     }).compile();
 
     automationController = moduleFixture.get<AutomationController>(AutomationController);
   });
 
   it('should be defined', () => {
-    expect(poolController).toBeDefined();
+    expect(automationController).toBeDefined();
   });
 
-   it('should get pool', async () => {
-    const pool =  await poolController.getPool(poolMock.id)
-    expect(pool).toBeDefined();
-    expect(pool.id).toEqual(poolMock.id);
+   it('should get automation', async () => {
+    const automation =  await automationController.getAutomation(newAutomationMock.id!, authorization)
+    expect(automation).toBeDefined();
+    expect(automation!.id).toEqual(newAutomationMock.id);
   });
 
   it('should NOT get pool', async () => {
     poolServiceMock.useValue.getPool.mockResolvedValue(null)
-    await expect(poolController.getPool(poolMock.id)).rejects.toEqual(new NotFoundException());
+    await expect(poolController.getPool(newAutomationMock.id)).rejects.toEqual(new NotFoundException());
   });
 
   it('should search pool', async () => {
-    const pool =  await poolController.searchPool(poolMock.symbol);
+    const pool =  await poolController.searchPool(newAutomationMock.symbol);
     expect(pool).toBeDefined();
     expect(pool.length).toBeTruthy();
   });
 
   it('should NOT search pool', async () => {
     poolServiceMock.useValue.searchPool.mockResolvedValue(null)
-    await expect(poolController.searchPool(poolMock.symbol)).rejects.toEqual(new NotFoundException());
+    await expect(poolController.searchPool(newAutomationMock.symbol)).rejects.toEqual(new NotFoundException());
   });
 
   it('should get pools', async () => {
     const pools =  await poolController.getPools(1, 1);
     expect(pools).toBeDefined();
     expect(pools.length).toEqual(1);
-    expect(pools[0].id).toEqual(poolMock.id);
+    expect(pools[0].id).toEqual(newAutomationMock.id);
   });
 
    it('should get top pools', async () => {
     const pools =  await poolController.topPools();
     expect(pools).toBeDefined();
     expect(pools.length).toEqual(1);
-    expect(pools[0].id).toEqual(poolMock.id);
+    expect(pools[0].id).toEqual(newAutomationMock.id);
   });
 
   it('should get symbols', async () => {
     const symbols =  await poolController.getSymbols();
     expect(symbols).toBeDefined();
     expect(symbols.length).toEqual(1);
-    expect(symbols[0]).toEqual(poolMock.symbol);
+    expect(symbols[0]).toEqual(newAutomationMock.symbol);
   });
   
   
