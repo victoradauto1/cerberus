@@ -1,12 +1,11 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { newAutomationMock, poolServiceMock } from "../pool/pool.service.mock";
 import { authServiceMock } from "../../test/auth/auth.service.mock";
 import { NotFoundException } from "@nestjs/common";
 import { AutomationController } from "../../src/automation/automation.controller";
-
-import { automationServiceMock, newAutomationMock } from "./automation.service.mock";
-
-import { userServiceMock } from "test/user/user.service.mock";
+import { activeAutomationMock, automationServiceMock, InactiveAutomationMock, newAutomationMock } from "./automation.service.mock";
+import { activeUserMock, userServiceMock } from "test/user/user.service.mock";
+import { AutomationDTO } from "../../src/automation/automation.dto";
+import { poolServiceMock } from "test/pool/pool.service.mock";
 
 describe('AutomationController tests', () => {
 
@@ -34,42 +33,75 @@ describe('AutomationController tests', () => {
     expect(automation!.id).toEqual(newAutomationMock.id);
   });
 
-  it('should NOT get pool', async () => {
-    poolServiceMock.useValue.getPool.mockResolvedValue(null)
-    await expect(poolController.getPool(newAutomationMock.id)).rejects.toEqual(new NotFoundException());
+   it('should get automations', async () => {
+    const automations =  await automationController.getAutomations(authorization)
+    expect(automations).toBeDefined();
+    expect(automations.length).toBeTruthy();
   });
 
-  it('should search pool', async () => {
-    const pool =  await poolController.searchPool(newAutomationMock.symbol);
-    expect(pool).toBeDefined();
-    expect(pool.length).toBeTruthy();
+  it('should get active automations', async () => {
+    const automations =  await automationController.getActiveAutomations(authorization)
+    expect(automations).toBeDefined();
+    expect(automations.length).toBeTruthy();
   });
 
-  it('should NOT search pool', async () => {
-    poolServiceMock.useValue.searchPool.mockResolvedValue(null)
-    await expect(poolController.searchPool(newAutomationMock.symbol)).rejects.toEqual(new NotFoundException());
+  it('should add automation', async () => {
+    const automationData= { ...activeAutomationMock} as AutomationDTO;
+    const result = await automationController.addAutomation(automationData, authorization);
+    expect(result.id).toBeTruthy();
   });
 
-  it('should get pools', async () => {
-    const pools =  await poolController.getPools(1, 1);
-    expect(pools).toBeDefined();
-    expect(pools.length).toEqual(1);
-    expect(pools[0].id).toEqual(newAutomationMock.id);
+  it('should add automation (opened)', async () => {
+    const automationData= { ...activeAutomationMock, isOpened:true, closeCondition: undefined} as AutomationDTO;
+    const result = await automationController.addAutomation(automationData, authorization);
+    expect(result.id).toBeTruthy();
   });
 
-   it('should get top pools', async () => {
-    const pools =  await poolController.topPools();
-    expect(pools).toBeDefined();
-    expect(pools.length).toEqual(1);
-    expect(pools[0].id).toEqual(newAutomationMock.id);
+  it('should NOT add automation (price1)', async () => {
+    userServiceMock.useValue.getUser = jest.fn().mockResolvedValue({...activeAutomationMock, privateKey: null});
+    const automationData= { ...activeAutomationMock} as AutomationDTO;
+    await expect(automationController.addAutomation(automationData, authorization))
+      .rejects
+      .toEqual(new Error('You must have a private key is settings before you update a automation.'));
+    userServiceMock.useValue.getUser =jest.fn().mockResolvedValue(activeUserMock);
   });
 
-  it('should get symbols', async () => {
-    const symbols =  await poolController.getSymbols();
-    expect(symbols).toBeDefined();
-    expect(symbols.length).toEqual(1);
-    expect(symbols[0]).toEqual(newAutomationMock.symbol);
+  it('should update automation', async () => {
+    const automationData= { ...activeAutomationMock} as AutomationDTO;
+    const result = await automationController.updateAutomation(activeAutomationMock.id!, automationData, authorization);
+    expect(result!.id).toEqual(activeAutomationMock.id);
   });
-  
-  
+
+  it('should update automation (inactive)', async () => {
+    const automationData= { ...InactiveAutomationMock} as AutomationDTO;
+    const result = await automationController.updateAutomation(activeAutomationMock.id!, automationData, authorization);
+    expect(result!.id).toEqual(activeAutomationMock.id);
+  });
+
+  it('should update automation (opened)', async () => {
+    const automationData= { ...activeAutomationMock, closeCondition:undefined, isOpened: true} as AutomationDTO;
+    const result = await automationController.updateAutomation(InactiveAutomationMock.id!, automationData, authorization);
+    expect(result!.id).toEqual(activeAutomationMock.id);
+  });
+
+  it('should update automation (price1)', async () => {
+    const automationData= { ...activeAutomationMock, openCondition:{
+      field:"price1",
+      operator:"==",
+      value: "0"
+    }} as AutomationDTO;
+    const result = await automationController.updateAutomation(InactiveAutomationMock.id!, automationData, authorization);
+    expect(result!.id).toEqual(activeAutomationMock.id);
+  });
+
+  it('should NOT update automation (price1)', async () => {
+    userServiceMock.useValue.getUser = jest.fn().mockResolvedValue({...activeAutomationMock, privateKey: null});
+    const automationData= { ...activeAutomationMock} as AutomationDTO;
+    await expect(automationController.updateAutomation(activeAutomationMock!.id, automationData, authorization))
+      .rejects
+      .toEqual(new Error('You must have a private key is settings before you update a automation.'));
+    userServiceMock.useValue.getUser =jest.fn().mockResolvedValue(activeUserMock);
+  });
+
+
 })

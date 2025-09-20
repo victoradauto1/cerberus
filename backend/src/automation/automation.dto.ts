@@ -32,7 +32,7 @@ export class AutomationDTO {
   @Optional()  
   @ValidateNested()
   @Type(()=> ConditionDTO)
-  closeCondition: ConditionDTO;
+  closeCondition?: ConditionDTO;
 
   @IsBoolean()
   @Optional()  
