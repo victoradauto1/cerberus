@@ -94,14 +94,31 @@ describe('AutomationController tests', () => {
     expect(result!.id).toEqual(activeAutomationMock.id);
   });
 
-  it('should NOT update automation (price1)', async () => {
+  it('should NOT update automation (private Key)', async () => {
     userServiceMock.useValue.getUser = jest.fn().mockResolvedValue({...activeAutomationMock, privateKey: null});
     const automationData= { ...activeAutomationMock} as AutomationDTO;
-    await expect(automationController.updateAutomation(activeAutomationMock!.id, automationData, authorization))
+    await expect(automationController.updateAutomation(activeAutomationMock.id!, automationData, authorization))
       .rejects
       .toEqual(new Error('You must have a private key is settings before you update a automation.'));
     userServiceMock.useValue.getUser =jest.fn().mockResolvedValue(activeUserMock);
   });
 
+  it('should delete automation', async () => {
+     const result = await automationController.deleteAutomation(activeAutomationMock.id!, authorization)
+    expect(result!.id).toEqual(activeAutomationMock.id);
+  });
 
+   it('should start automation', async () => {
+     const result = await automationController.startAutomation(activeAutomationMock.id!, authorization)
+    expect(result!.isActive).toBeTruthy();
+  });
+
+  it('should start automation (no poolId)', async () => {
+     userServiceMock.useValue.getUser = jest.fn().mockResolvedValue({...activeAutomationMock, poolId: ""});
+     const result = await automationController.startAutomation(activeAutomationMock.id!, authorization)
+    expect(result!.isActive).toBeTruthy();
+    userServiceMock.useValue.getUser = jest.fn().mockResolvedValue({...activeAutomationMock});
+  });
+
+  
 })
