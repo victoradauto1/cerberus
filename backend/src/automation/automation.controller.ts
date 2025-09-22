@@ -11,7 +11,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../../src/auth/auth.guard';
 import { AuthService } from '../auth/auth.service';
 import { PoolService } from '../pool/pool.service';
 import { UserService } from '../user/user.service';
