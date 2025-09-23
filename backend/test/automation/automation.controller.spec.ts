@@ -147,6 +147,26 @@ describe('AutomationController tests', () => {
     expect(result!.id).toEqual(activeAutomationMock.id);
   });
 
+   it('should update automation (no poolId)', async () => {
+      const automationData = {
+      ...activeAutomationMock,
+      poolId: ""
+    } as AutomationDTO;
+    userServiceMock.useValue.getUser = jest
+      .fn()
+      .mockResolvedValue(automationData);
+
+    const result = await automationController.updateAutomation(
+     InactiveAutomationMock.id!,
+      automationData,
+      authorization,
+    );
+    expect(result!.poolId).toBeFalsy();
+    userServiceMock.useValue.getUser = jest
+      .fn()
+      .mockResolvedValue({ ...activeAutomationMock });
+  });
+
   it('should NOT update automation (private Key)', async () => {
     userServiceMock.useValue.getUser = jest
       .fn()
@@ -258,4 +278,5 @@ describe('AutomationController tests', () => {
     );
     expect(result!.isActive).toBeFalsy();
   });
+
 });

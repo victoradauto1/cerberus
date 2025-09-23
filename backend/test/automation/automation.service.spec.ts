@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { automations } from 'commons/data';
-import { AutomationService } from 'src/automation/automation.service';
-import { prismaMock } from 'test/db.mock';
+import { AutomationService } from '../../src/automation/automation.service';
+import { prismaMock } from '../../test/db.mock';
 import {
   activeAutomationMock,
   InactiveAutomationMock,

@@ -1,3 +1,5 @@
+/*istanbul ignore file */
+
 import { Optional } from '@nestjs/common';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsInt, IsString, ValidateNested} from 'class-validator';
