@@ -17,6 +17,8 @@ import { PoolService } from '../pool/pool.service';
 import { UserService } from '../user/user.service';
 import { AutomationDTO } from './automation.dto';
 import { AutomationService } from './automation.service';
+import {getAllowace, preApprove} from 'commons/services/uniswapService';
+import ethers from "ethers";
 
 @Controller('automations')
 export class AutomationController {
@@ -40,7 +42,7 @@ export class AutomationController {
         'You must have a private key is settings before you start a automation.',
       );
 
-    const response = await this.automationService.addAutomation(
+    const automationResult = await this.automationService.addAutomation(
       jwt.userId,
       automation,
     );
@@ -50,12 +52,14 @@ export class AutomationController {
       const condition = automation.isOpened
         ? automation.closeCondition
         : automation.openCondition;
-      if (!condition) return response;
-      const tokenAddress =
-        condition.field.indexOf('price0') !== -1 ? pool.token1 : pool.token0;
+      if (!condition) return automationResult;
+      const tokenAddress = condition.field.indexOf('price0') !== -1 ? pool.token1 : pool.token0;
+
+      await preApprove(user, tokenAddress, automation.nextAmount);
+
     }
 
-    return response;
+    return automationResult;
   }
 
   @UseGuards(AuthGuard)
@@ -88,8 +92,13 @@ export class AutomationController {
     if (!condition) return automationResult;
 
     const pool = await this.poolService.getPool(automation.poolId);
-    const tokenAddress =
-      condition.field.indexOf('price0') !== -1 ? pool.token1 : pool.token0;
+    const tokenAddress = condition.field.indexOf('price0') !== -1 ? pool.token1 : pool.token0;
+
+    const allowance = await getAllowace(tokenAddress, user.address);
+    if(allowance < ethers.parseEther(automation.nextAmount))
+      await preApprove(user,tokenAddress, automation.nextAmount);
+
+    return automationResult;
   }
 
   @UseGuards(AuthGuard)
@@ -130,6 +139,12 @@ export class AutomationController {
     const pool = await this.poolService.getPool(automation.poolId);
     const tokenAddress =
       condition.field.indexOf('price0') !== -1 ? pool.token1 : pool.token0;
+    
+    const allowance = await getAllowace(tokenAddress, user.address);
+    if(allowance < ethers.parseEther(automation.nextAmount))
+      await preApprove(user,tokenAddress, automation.nextAmount);
+
+    return automation;
   }
 
   @UseGuards(AuthGuard)
