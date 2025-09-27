@@ -4,7 +4,7 @@ import ConfigBase from "../configBase";
 import { User } from "../models/user";
 import { PoolData, TokenData } from "./uniswapTypes";
 
-const ABI_ERC20 = require("./ERC20.json");
+import * as ABI_ERC20 from "./ERC20.json";
 
 export async function getTokens(skip: number = 0): Promise<TokenData[]> {
   const query = `
@@ -91,8 +91,11 @@ export async function approve(
   await tx.wait();
 }
 
-export async function getAllowace(tokenAddress: string, wallet: string): Promise<bigint>{
+export async function getAllowace(
+  tokenAddress: string,
+  wallet: string
+): Promise<bigint> {
   const provider = new ethers.JsonRpcProvider(ConfigBase.RPC_NODE);
-  const tokenContract =  new ethers.Contract(tokenAddress, ABI_ERC20, provider);
+  const tokenContract = new ethers.Contract(tokenAddress, ABI_ERC20, provider);
   return tokenContract.allowance(wallet, ConfigBase.UNISWAP_ROUTER);
 }
