@@ -5,6 +5,8 @@ import { User } from "../models/user";
 import { PoolData, TokenData } from "./uniswapTypes";
 
 import * as ABI_ERC20 from "./ERC20.json";
+import Automation from "../models/automation";
+import Pool from "../models/pool";
 
 export async function getTokens(skip: number = 0): Promise<TokenData[]> {
   const query = `
@@ -98,4 +100,8 @@ export async function getAllowace(
   const provider = new ethers.JsonRpcProvider(ConfigBase.RPC_NODE);
   const tokenContract = new ethers.Contract(tokenAddress, ABI_ERC20, provider);
   return tokenContract.allowance(wallet, ConfigBase.UNISWAP_ROUTER);
+}
+
+export async function swap(user: User, automation: Automation, pool: Pool): Promise<string>{
+  return Promise.resolve("0"); //amountOut
 }
