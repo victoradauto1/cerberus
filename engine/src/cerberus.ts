@@ -6,7 +6,12 @@ import { swap } from "commons/services/uniswapService";
 import sendMail from "./services/mailService";
 
 function evalCondition(automation: Automation, pool: Pool): boolean {
-  return false;
+  const condition = automation.isOpened? automation.closeCondition : automation.openCondition;
+  if(!condition) return false;
+
+  const ifCondition = `pool.${condition.field}${condition.operator}${condition.value}`;
+  console.log(`Condition: ${ifCondition}`)
+  return Function("pool", "return" + ifCondition)(pool);
 }
 
 export default async (pool: Pool): Promise<void> => {
@@ -28,8 +33,10 @@ export default async (pool: Pool): Promise<void> => {
 
     try {
       const amountOut = await swap(user, automation, pool);
+      if(amountOut !== "0")
+        automation.nextAmount = amountOut;
+      
       automation.isOpened = !automation.isOpened;
-      automation.nextAmount = amountOut;
          //registrar o trade
     } catch (error: any) {
         console.error(`Cannot swap. AutomationId: ${automation.id}`);

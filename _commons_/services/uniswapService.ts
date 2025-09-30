@@ -4,9 +4,11 @@ import ConfigBase from "../configBase";
 import { User } from "../models/user";
 import { PoolData, TokenData } from "./uniswapTypes";
 
-import * as ABI_ERC20 from "./ERC20.json";
 import Automation from "../models/automation";
 import Pool from "../models/pool";
+import * as ABI_ERC20 from "./ERC20.json";
+import * as ABI_UNISWAP from "./Uniswap.json";
+import { Resolver } from "dns";
 
 export async function getTokens(skip: number = 0): Promise<TokenData[]> {
   const query = `
@@ -102,6 +104,23 @@ export async function getAllowace(
   return tokenContract.allowance(wallet, ConfigBase.UNISWAP_ROUTER);
 }
 
-export async function swap(user: User, automation: Automation, pool: Pool): Promise<string>{
-  return Promise.resolve("0"); //amountOut
+export async function swap(
+  user: User,
+  automation: Automation,
+  pool: Pool
+): Promise<string> {
+  if (!user.privateKey) return Promise.resolve("0");
+
+  const provider = new ethers.JsonRpcProvider(ConfigBase.RPC_NODE);
+  const signer = new ethers.Wallet(user.privateKey, provider);
+  const routerContract = new ethers.Contract(
+    ConfigBase.UNISWAP_ROUTER,
+    ABI_UNISWAP,
+    provider
+  );
+  const token0Contract = new ethers.Contract(pool.token0, ABI_ERC20, signer);
+  const token1Contract = new ethers.Contract(pool.token1, ABI_ERC20, signer);
+
+  const condition = automation.isOpened? automation.closeCondition : automation.openCondition;
+  
 }
