@@ -6,8 +6,8 @@ import { PoolData, TokenData } from "./uniswapTypes";
 
 import Automation from "../models/automation";
 import Pool from "../models/pool";
-import * as ABI_ERC20 from "./ERC20.json";
-import * as ABI_UNISWAP from "./Uniswap.json";
+const ABI_ERC20 = require("./ERC20.json");
+const ABI_UNISWAP = require("./Uniswap.json")
 
 export async function getTokens(skip: number = 0): Promise<TokenData[]> {
   const query = `
