@@ -1,5 +1,5 @@
 import axios from "axios";
-import ethers, { TransactionResponse } from "ethers";
+import ethers, { TransactionReceipt, TransactionResponse } from "ethers";
 import ConfigBase from "../configBase";
 import { User } from "../models/user";
 import { PoolData, TokenData } from "./uniswapTypes";
@@ -8,7 +8,6 @@ import Automation from "../models/automation";
 import Pool from "../models/pool";
 import * as ABI_ERC20 from "./ERC20.json";
 import * as ABI_UNISWAP from "./Uniswap.json";
-import { Resolver } from "dns";
 
 export async function getTokens(skip: number = 0): Promise<TokenData[]> {
   const query = `
@@ -121,6 +120,57 @@ export async function swap(
   const token0Contract = new ethers.Contract(pool.token0, ABI_ERC20, signer);
   const token1Contract = new ethers.Contract(pool.token1, ABI_ERC20, signer);
 
-  const condition = automation.isOpened? automation.closeCondition : automation.openCondition;
-  
+  const condition = automation.isOpened
+    ? automation.closeCondition
+    : automation.openCondition;
+  if (!condition) return Promise.resolve("0");
+
+  const [tokenIn, tokenOut] =
+    condition.field.indexOf("price0") !== -1
+      ? [token1Contract, token0Contract]
+      : [token0Contract, token1Contract];
+
+  const amountIn = ethers.parseEther(automation.nextAmount);
+
+  const allowance = await getAllowace(tokenIn.target.toString(), user.address);
+  if (allowance < amountIn) await approve(tokenIn, amountIn);
+
+  const params = {
+    tokenIn,
+    tokenOut,
+    fee: pool.fee,
+    recipient: user.address,
+    deadline: Date.now() / 1000 + 10,
+    amountIn,
+    amountOutMinimum: 0,
+    sqrtPriceLimitX96: 0,
+  };
+
+  console.log(params);
+
+  const tx: TransactionResponse = await routerContract.exactInputSingle(params, {
+    from: user.address,
+    gasPrice: ethers.parseUnits("25", "gwei"),
+    gasLimit: 250000
+  });
+
+  console.log("Swap Tx Id: "+ tx.hash);
+
+  let amountOutWei: bigint = 0n;
+
+  try {
+     const receipt: TransactionReceipt | null = await tx.wait();
+  if(!receipt) throw new Error(`Swap error. Tx id: ${tx.hash}`);
+  amountOutWei = ethers.toBigInt(receipt.logs[0].data);
+  if(!amountOutWei) throw new Error(`Swap error. Tx id: ${tx.hash}`);
+  } catch (error: any) {
+    console.log(error);
+    throw new Error(`Swap error. Tx id: ${tx.hash}`);
+  }
+
+  const amountOutEth = ethers.formatEther(amountOutWei);
+  console.log(`Swap success. Tx id ${tx.hash}. amount Out: ${amountOutEth}`);
+
+  return amountOutEth;
+
 }
