@@ -37,6 +37,8 @@ model pools {
   token0   String
   token1   String
   symbol   String
+  decimals0 Int
+  decimals1 Int
   symbol0  String
   symbol1  String
   fee      Int

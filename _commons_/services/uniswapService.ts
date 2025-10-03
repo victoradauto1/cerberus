@@ -62,7 +62,7 @@ export async function getTopPools(
 export async function preApprove(
   user: User,
   tokenToApprove: string,
-  amountInEth: string
+  amountInWei: string
 ) {
   if (!user.privateKey) throw new Error("User doesn't have private key.");
 
@@ -74,7 +74,7 @@ export async function preApprove(
 
   const tx: TransactionResponse = await tokencontract.approve(
     ConfigBase.UNISWAP_ROUTER,
-    ethers.parseEther(amountInEth)
+    amountInWei
   );
   console.log(`Approve tx: ${tx.hash}`);
 
@@ -130,7 +130,7 @@ export async function swap(
       ? [token1Contract, token0Contract]
       : [token0Contract, token1Contract];
 
-  const amountIn = ethers.parseEther(automation.nextAmount);
+  const amountIn = BigInt(automation.nextAmount);
 
   const allowance = await getAllowace(tokenIn.target.toString(), user.address);
   if (allowance < amountIn) await approve(tokenIn, amountIn);
@@ -168,9 +168,9 @@ export async function swap(
     throw new Error(`Swap error. Tx id: ${tx.hash}`);
   }
 
-  const amountOutEth = ethers.formatEther(amountOutWei);
-  console.log(`Swap success. Tx id ${tx.hash}. amount Out: ${amountOutEth}`);
 
-  return amountOutEth;
+  console.log(`Swap success. Tx id ${tx.hash}. amount Out: ${amountOutWei}`);
+
+  return amountOutWei.toString();
 
 }

@@ -1,3 +1,4 @@
+import { JsonRpcApiPollingProvider } from "ethers/lib.commonjs/providers/provider-jsonrpc";
 import { ChainId } from "./chainId";
 import { Exchange } from "./exchange";
 
@@ -7,6 +8,8 @@ export default class Pool {
   token1: string;
   symbol0: string;
   symbol1: string;
+  decimals0: number;
+  decimals1: number;
   symbol: string;
   fee: number;
   exchange: Exchange;
@@ -36,6 +39,8 @@ export default class Pool {
     this.token1 = pool.token1;
     this.symbol0 = pool.symbol0;
     this.symbol1 = pool.symbol1;
+    this.decimals0 = pool.decimals0;
+    this.decimals1 = pool.decimals1;
     this.symbol = pool.symbol;
     this.fee = pool.fee;
     this.exchange = pool.exchange;

@@ -1,4 +1,9 @@
 {
+  "include": [
+    "**/*",
+    "../_commons_/services/Uniswap.json",
+    "../_commons_/services/ERC20.json"
+  ],
   "compilerOptions": {
     "module": "commonjs",
     "resolveJsonModule": true,
@@ -12,12 +17,9 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "commons/*":["../_commons_/*"]
+      "commons/*": ["../_commons_/*"]
     },
-    "rootDirs": [
-      "./",
-      "../_commons_/*"
-    ],
+    "rootDirs": ["./", "../_commons_/*"],
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
