@@ -5,7 +5,11 @@ import FooterAdmin from "@/components/Footers/FooterAdmin";
 import AdminNavbar from "@/components/Navbars/AdminNavbar";
 import RadioGroup from "@/components/RadioGroup";
 import Sidebar from "@/components/Sidebar/Sidebar";
-import { addAutomation, updateAutomation, getAutomation } from "@/services/AutomationService";
+import {
+  addAutomation,
+  updateAutomation,
+  getAutomation,
+} from "@/services/AutomationService";
 import Automation, { Condition } from "commons/models/automation";
 import { ChainId } from "commons/models/chainId";
 import { Exchange } from "commons/models/exchange";
@@ -14,6 +18,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import ConditionInput from "./ConditionInput";
 import PoolInput from "./PoolInput";
+import { ethers } from "ethers";
 
 export default function newAutomation() {
   const { push } = useRouter();
@@ -36,20 +41,13 @@ export default function newAutomation() {
 
   useEffect(() => {
     if (!automationId) return;
-    
+
     getAutomation(automationId)
-      .then(automation => setAutomation(automation))
-      .catch(err => setError(err.response? JSON.stringify(err.response.data): err.message))
-
-
+      .then((automation) => setAutomation(automation))
+      .catch((err) =>
+        setError(err.response ? JSON.stringify(err.response.data) : err.message)
+      );
   }, [automationId]);
-
-  function onAutomationChange(evt: React.ChangeEvent<HTMLInputElement>) {
-    setAutomation((previousState: any) => ({
-      ...previousState,
-      [evt.target.id]: evt.target.value,
-    }));
-  }
 
   function btnSaveClick() {
     if (!automation.name) {
@@ -76,11 +74,13 @@ export default function newAutomation() {
     else promise = addAutomation(automation);
 
     promise
-      .then(automation => push("/automatios"))
-      .catch(err=> {
+      .then((automation) => push("/automatios"))
+      .catch((err) => {
         setIsLoading(false);
-        setError(err.response? JSON.stringify(err.response.data) : err.message)
-      })
+        setError(
+          err.response ? JSON.stringify(err.response.data) : err.message
+        );
+      });
   }
 
   function onPoolChange(pool: Pool | null) {
@@ -103,6 +103,46 @@ export default function newAutomation() {
       ...prevState,
       closeCondition: condition,
     }));
+  }
+
+  function getDecimals(): number {
+    let decimals: number = 18;
+
+    if (pool && pool.decimals0 && pool.decimals1) {
+      decimals = automation.isOpened ? pool.decimals0 : pool.decimals1;
+    }
+    return decimals;
+  }
+
+  function formatAmount() {
+    if (!automation || !automation.nextAmount) return "0";
+
+    const decimals = getDecimals();
+    return ethers.formatUnits(automation.nextAmount, decimals) || "0";
+  }
+
+  function onAmountChange(evt: React.ChangeEvent<HTMLInputElement>) {
+    const decimals = getDecimals();
+    const amountInWei = ethers.parseUnits(evt.target.value, decimals);
+    setAutomation((previousState: any) => ({
+      ...previousState,
+      nextAmount: amountInWei.toString(),
+    }));
+  }
+
+  function onAutomationChange(evt: React.ChangeEvent<HTMLInputElement>) {
+    setAutomation((previousState: any) => ({
+      ...previousState,
+      [evt.target.id]: evt.target.value,
+    }));
+  }
+
+  function getAmountToolTip() {
+    if (!pool || !automation) return "";
+
+    return automation.isOpened
+      ? `${pool.symbol0 || "symbol0"} to sell`
+      : `${pool.symbol1 || "symbol1"} to buy ${pool.symbol0 || "symbol0"}`;
   }
 
   return (
@@ -206,20 +246,14 @@ export default function newAutomation() {
                           className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
                           htmlFor="nextAmount"
                         >
-                          Trade Amount (
-                          {automation.isOpened
-                            ? `${pool.symbol0 || "symbol0"} to sell`
-                            : `${pool.symbol1 || "symbol1"} to buy ${
-                                pool.symbol0 || "symbol0"
-                              }`}
-                          )
+                          Wei Amount {getAmountToolTip()}
                         </label>
                         <input
                           type="text"
                           className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                           id="nextAmount"
-                          defaultValue={automation.nextAmount || "0"}
-                          onChange={onAutomationChange}
+                          defaultValue={formatAmount()}
+                          onChange={onAmountChange}
                         />
                       </div>
                     </div>
