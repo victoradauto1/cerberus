@@ -12,76 +12,98 @@ model tokens {
   id       String @id @map("_id")
   name     String
   symbol   String
-  decimals Int @default(18)
-  network  Int @default(137)
+  decimals Int    @default(18)
+  network  Int    @default(137)
 }
 
 model users {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  address String @unique
-  name String
-  email String
-  status Int @default(1)
-  network Int @default(137)
-  planId String
-  privateKey String
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  address      String        @unique
+  name         String
+  email        String
+  status       Int           @default(1)
+  network      Int           @default(137)
+  planId       String
+  privateKey   String
   activateCode String
   activateDate DateTime
-  automations automations[]
+  automations  automations[]
+  trades       trades[]      @ignore
 
   @@index([email])
 }
 
 model pools {
-  id       String   @id @map("_id")
-  token0   String
-  token1   String
-  symbol   String
+  id        String @id @map("_id")
+  token0    String
+  token1    String
+  symbol    String
   decimals0 Int
   decimals1 Int
-  symbol0  String
-  symbol1  String
-  fee      Int
-  exchange Int @default(1)
-  network  Int @default(137)
+  symbol0   String
+  symbol1   String
+  fee       Int
+  exchange  Int    @default(1)
+  network   Int    @default(137)
 
-  price0           Float
-  price0Change     Float
-  price0_15        Float?
-  price0_15Change  Float?
-  price0_60        Float?
-  price0_60Change  Float?
+  price0          Float
+  price0Change    Float
+  price0_15       Float?
+  price0_15Change Float?
+  price0_60       Float?
+  price0_60Change Float?
 
-  lastUpdate       DateTime
-  lastUpdate_15    DateTime
-  lastUpdate_60    DateTime
+  lastUpdate    DateTime
+  lastUpdate_15 DateTime
+  lastUpdate_60 DateTime
 
-  price1           Float
-  price1Change     Float
-  price1_15        Float?
-  price1_15Change  Float?
-  price1_60        Float?
-  price1_60Change  Float?
-  automations automations[] @ignore
+  price1          Float
+  price1Change    Float
+  price1_15       Float?
+  price1_15Change Float?
+  price1_60       Float?
+  price1_60Change Float?
+  automations     automations[] @ignore
 }
 
-type Condition{
-  field String
+type Condition {
+  field    String
   operator String
-  value String  
+  value    String
 }
-model automations{
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @db.ObjectId
-  user users @relation(fields: [userId], references: [id])
-  exchange Int @default(1)
-  network Int @default(1)
-  name String
-  poolId String?
-  pool pools? @relation(fields: [poolId], references: [id])
-  openCondition Condition
+
+model automations {
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String     @db.ObjectId
+  user           users      @relation(fields: [userId], references: [id])
+  exchange       Int        @default(1)
+  network        Int        @default(1)
+  name           String
+  poolId         String?
+  pool           pools?     @relation(fields: [poolId], references: [id])
+  openCondition  Condition
   closeCondition Condition?
-  isOpened Boolean @default(false)
-  isActive Boolean @default(false)
-  nextAmount String
+  isOpened       Boolean    @default(false)
+  isActive       Boolean    @default(false)
+  nextAmount     String
+  pnl Float @default(0)
+  trades         trades[]
+  tradeCount Int @default(0)
+}
+
+model trades {
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String      @db.ObjectId
+  user           users       @relation(fields: [userId], references: [id])
+  automationId   String      @db.ObjectId
+  automation     automations @relation(fields: [automationId], references: [id])
+  openDate       DateTime    @default(now())
+  closeDate      DateTime?
+  openPrice      Float
+  openAmountIn   String
+  openAmountOut  String
+  closePrice     Float?
+  closeAmountIn  String?
+  closeAmountOut String?
+  pnl            Float       @default(0)
 }
