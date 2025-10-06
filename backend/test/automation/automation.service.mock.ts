@@ -23,6 +23,8 @@ export const newAutomationMock = {
     operator: '==',
     value: '0',
   },
+  pnl:10,
+  tradeCount:10
 } as Automation;
 
 export const activeAutomationMock = {
