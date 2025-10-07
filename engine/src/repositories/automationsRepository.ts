@@ -72,7 +72,9 @@ async function updateAutomation(automationData: Automation): Promise<Automation 
       name: automationData.name,
       network: automationData.network,
       nextAmount: automationData.nextAmount,
-      poolId: automationData.poolId
+      poolId: automationData.poolId,
+      tradeCount: automationData.tradeCount,
+      pnl: automationData.pnl
     }
   });
 

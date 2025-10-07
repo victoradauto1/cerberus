@@ -2,7 +2,7 @@ import axios from "axios";
 import ethers, { TransactionReceipt, TransactionResponse } from "ethers";
 import ConfigBase from "../configBase";
 import { User } from "../models/user";
-import { PoolData, TokenData } from "./uniswapTypes";
+import { PoolData, swapData, TokenData } from "./uniswapTypes";
 
 import Automation from "../models/automation";
 import Pool from "../models/pool";
@@ -107,8 +107,8 @@ export async function swap(
   user: User,
   automation: Automation,
   pool: Pool
-): Promise<string> {
-  if (!user.privateKey) return Promise.resolve("0");
+): Promise< swapData | null> {
+  if (!user.privateKey) return null;
 
   const provider = new ethers.JsonRpcProvider(ConfigBase.RPC_NODE);
   const signer = new ethers.Wallet(user.privateKey, provider);
@@ -123,10 +123,11 @@ export async function swap(
   const condition = automation.isOpened
     ? automation.closeCondition
     : automation.openCondition;
-  if (!condition) return Promise.resolve("0");
+  if (!condition) return null;
 
-  const [tokenIn, tokenOut] =
-    condition.field.indexOf("price0") !== -1
+  const isPrice0Condition = condition.field.indexOf("price0") !== -1
+
+  const [tokenIn, tokenOut] = isPrice0Condition
       ? [token1Contract, token0Contract]
       : [token0Contract, token1Contract];
 
@@ -171,6 +172,12 @@ export async function swap(
 
   console.log(`Swap success. Tx id ${tx.hash}. amount Out: ${amountOutWei}`);
 
-  return amountOutWei.toString();
+  return {
+    tokenIn: tokenIn.target.toString(),
+    tokenOut: tokenOut.target.toString(),
+    amountIn: amountIn.toString(),
+    amountOut: amountOutWei.toString(),
+    price: isPrice0Condition? pool.price0 : pool.price1
+  } as swapData
 
 }

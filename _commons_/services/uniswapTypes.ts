@@ -14,3 +14,12 @@ export type PriceData = {
 }
 
 export type PoolData = PriceData & {id: string, volumeUsd: string };
+
+
+export type swapData = {
+    tokenIn: string;
+    tokenOut: string;
+    amountIn: string;
+    amountOut: string;
+    price: number;
+}
