@@ -92,7 +92,7 @@ model automations {
 }
 
 model trades {
-  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
   userId         String      @db.ObjectId
   user           users       @relation(fields: [userId], references: [id])
   automationId   String      @db.ObjectId

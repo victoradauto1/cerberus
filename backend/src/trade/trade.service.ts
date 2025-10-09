@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import db from "../db";
+import Trade from "commons/models/trade"
 
 @Injectable()
 export class TradeService{
